@@ -1,0 +1,168 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: KRaftController
+metadata:
+  name: kraftcontroller
+  namespace: confluent
+spec:
+  replicas: 3
+  oneReplicaPerNode: true
+  image:
+    application: docker.io/confluentinc/cp-server:7.8.1
+    init: docker.io/confluentinc/confluent-init-container:2.11.0
+  dataVolumeCapacity: 100Gi
+  storageClass:
+    name: confluent-storage
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "2"
+        memory: "4Gi"
+      limits:
+        cpu: "4"
+        memory: "4Gi"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: app-confluent
+                  operator: In
+                  values:
+                    - kraft
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: Kafka
+metadata:
+  name: kafka
+  namespace: confluent
+spec:
+  replicas: 3
+  oneReplicaPerNode: true
+  image:
+    application: docker.io/confluentinc/cp-server:7.8.1
+    init: docker.io/confluentinc/confluent-init-container:2.11.0
+  dataVolumeCapacity: 2000Gi
+  storageClass:
+    name: confluent-storage
+  listeners:
+    external:
+      externalAccess:
+        type: nodePort
+        nodePort:
+          host: "<NODEIP/HOST>"
+          nodePortOffset: 30000
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "8"
+        memory: "32Gi"
+      limits:
+        cpu: "24"
+        memory: "64Gi"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: app-confluent
+                  operator: In
+                  values:
+                    - kafka-broker
+  dependencies:
+    kRaftController:
+      clusterRef:
+        name: kraftcontroller
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: SchemaRegistry
+metadata:
+  name: schemaregistry
+  namespace: confluent
+spec:
+  replicas: 2
+  oneReplicaPerNode: true
+  image:
+    application: docker.io/confluentinc/cp-schema-registry:7.8.1
+    init: docker.io/confluentinc/confluent-init-container:2.11.0
+  externalAccess:
+    type: nodePort
+    nodePort:
+      host: "<NODEIP/HOST>"
+      nodePortOffset: 30020
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: app-confluent
+                  operator: In
+                  values:
+                    - sr
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ControlCenter
+metadata:
+  name: controlcenter
+  namespace: confluent
+spec:
+  replicas: 1
+  oneReplicaPerNode: true
+  image:
+    application: docker.io/confluentinc/cp-enterprise-control-center:7.8.1
+    init: docker.io/confluentinc/confluent-init-container:2.11.0
+  dataVolumeCapacity: 300Gi
+  storageClass:
+    name: confluent-storage
+  externalAccess:
+    type: nodePort
+    nodePort:
+      host: "<NODEIP/HOST>"
+      nodePortOffset: 30050
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "8"
+        memory: "16Gi"
+      limits:
+        cpu: "12"
+        memory: "32Gi"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: app-confluent
+                  operator: In
+                  values:
+                    - c3
+  dependencies:
+    schemaRegistry:
+      url: http://schemaregistry.confluent.svc.cluster.local:8081
+    connect:
+      - name: connect
+        url: http://connect.confluent.svc.cluster.local:8083
+---

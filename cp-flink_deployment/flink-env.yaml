@@ -1,0 +1,18 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: FlinkEnvironment
+metadata:
+  name: flink-env
+  namespace: confluent
+spec:
+  kubernetesNamespace: flink
+  flinkApplicationDefaults:
+    metadata:
+      labels:
+        "acmecorp.com/owned-by": "analytics-team"
+    spec:
+      flinkConfiguration:
+        taskmanager.numberOfTaskSlots: "2"
+        rest.profiling.enabled": "true"
+  cmfRestClassRef:
+    name: default
+    namespace: confluent

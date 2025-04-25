@@ -1,0 +1,74 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connect
+metadata:
+  name: connect
+  namespace: confluent
+spec:
+  replicas: 2
+  oneReplicaPerNode: true
+  image:
+    application: docker.io/<repo>/<custom-image>
+    init: docker.io/confluentinc/confluent-init-container:2.11.0
+  externalAccess:
+    type: nodePort
+    nodePort:
+      host: "kafka-confluent.ril.co.tz"
+      nodePortOffset: 30010
+  mountedSecrets:
+    - secretRef:
+        name: replicator-keytab
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "4"
+        memory: "24Gi"
+      limits:
+        cpu: "8"
+        memory: "48Gi"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: app-confluent
+                  operator: In
+                  values:
+                    - connect
+    probe:
+      liveness:
+        periodSeconds: 10
+        failureThreshold: 5
+        timeoutSeconds: 100
+    envVars:
+      - name: CLASSPATH
+        value: /usr/share/confluent-hub-components/confluentinc-kafka-connect-replicator/lib/replicator-rest-extension-7.8.1.jar
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
+  mountedVolumes:
+    volumes:
+      - name: kerberos-config
+        configMap:
+          name: kafka-kerberos-config
+      - name: kerberos-secret
+        secret:
+          secretName: replicator-keytab-secret
+    volumeMounts:
+      - name: kerberos-config
+        mountPath: /mnt/kerberos
+        readOnly: true
+      - name: kerberos-secret
+        mountPath: /mnt/kerberos/replicator-keytab
+        readOnly: true
+      
+  configOverrides:
+    server:
+      - "connector.client.config.override.policy=All"
+      - rest.extension.classes=io.confluent.connect.replicator.monitoring.ReplicatorMonitoringExtension
+    jvm:
+      - -Dsun.security.krb5.debug=true
+      - -Djava.security.krb5.conf=/mnt/kerberos/krb5.conf
