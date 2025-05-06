@@ -209,7 +209,7 @@ kubectl config set-context --current --namespace confluent
 
 helm repo add confluentinc https://packages.confluent.io/helm
 
-helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes --namespace confluent -f ./operator_values/cfk-values.yaml --set enableCMFDay2Ops=true
+helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes --namespace confluent -f ./operator_values/cfk-operator_values.yaml --set enableCMFDay2Ops=true --set namespaced=false
 ```
 
 Check that the operator pod is running:
@@ -269,16 +269,45 @@ Browse: [http://localhost:9021](http://localhost:9021)
 
 ## Step 7: Deploy Flink Operators
 
-Set up cert-manager and install Flink operators:
-
+Create a namespace for flink workloads:
+```
+kubectl create namespace flink
+```
+**Set up cert-manager and install Flink kubernetes operator**
 ```bash
 kubectl create -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
 
-helm upgrade --install cp-flink-kubernetes-operator confluentinc/flink-kubernetes-operator -n confluent -f ./operator_values/flink-operator-values.yaml
-  
-helm upgrade --install cmf confluentinc/confluent-manager-for-apache-flink --namespace confluent
+helm upgrade --install cp-flink-kubernetes-operator confluentinc/flink-kubernetes-operator -n flink -f ./operator_values/flink-operator_values.yaml
+```
+***Customizing Flink CMF Helm Chart with Node Placement Rules***
+This customization introduces targeted scheduling rules for the Confluent Manager for Flink by modifying the Helm chart.
 
-kubectl get pods -n confluent
+1. Pull and extract the helm chart for confluent-manager-for-apache-flink:
+```bash
+helm pull confluentinc/confluent-manager-for-apache-flink
+tar xvf ...
+```
+
+2. In the Helm chart’s templates/deployment.yaml, the following was injected spec.template.spec:
+```bash
+      {{- if .Values.operatorPod.nodeSelector }}
+      nodeSelector: {{ toYaml .Values.operatorPod.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.operatorPod.affinity }}
+      affinity: {{ toYaml .Values.operatorPod.affinity | nindent 8 }}
+      {{- end }}
+      {{- with .Values.operatorPod.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+```
+3. Install the operator
+```bash
+helm upgrade --install cmf confluentinc/confluent-manager-for-apache-flink --namespace flink -f ./operator_values/cmf-operator_values.yaml
+```
+Verify the operator pods are running
+```bash
+kubectl get pods -n flink
 ```
 ---
 
@@ -287,8 +316,6 @@ kubectl get pods -n confluent
 Update the Flink application configuration with Azure blob storage access keys.
 
 ```bash
-kubectl create namespace flink
-
 kubectl apply -f cmfrestclass.yaml
 
 kubectl apply -f flink-env.yaml
@@ -298,7 +325,12 @@ kubectl apply -f flink-app.yaml
 
 Access Flink Web UI:
 ```bash
-kubectl port-forward flink-app-rest 8081:8081 -n flink
+kubectl port-forward svc/flink-app-rest 8081:8081 -n flink
+
+```
+Note: service name is constructed as <flinkApplication.metadata.name>-rest
+```bash
+curl -X GET localhost:8081/overview
 ```
 ---
 ## Step 9: Deploy Replicator
@@ -323,7 +355,7 @@ kubectl create secret generic replicator-keytab-secret \
 kubectl get secret replicator-keytab -n confluent -o yaml
 ```
 
-**Create a configmap as follows:**
+**Create a configmap for krb5.conf as follows:**
 
 ```bash
 apiVersion: v1
@@ -336,7 +368,6 @@ data:
     <contents of krb5.conf file>
 ```
 **Build a custom connect image and reference it:**
-
 Build a custom image based on `cp-server-connect` that includes the **Replicator plugin** pre-installed.
 ```bash
 docker build . -t <repo>/<custom-image-name>  -f ./replicator/Dockerfile --platform=linux/amd64

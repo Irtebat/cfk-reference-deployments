@@ -24,8 +24,9 @@ spec:
       com.sun.security.auth.module.Krb5LoginModule required
       useKeyTab=true
       storeKey=true
-      keyTab="/mnt/kerberos/replicator-keytab/replicator.keytab /mnt/secrets/replicator-keytab/replicator.keytab"
+      keyTab="/mnt/kerberos/replicator-keytab/replicator.keytab"
       principal="replicator@EXAMPLE.COM";
+    src.consumer.auto.offset.reset: "earliest"
     src.kafka.sasl.kerberos.kinit.cmd: "/usr/bin/kinit"
     src.kafka.kerberos.min.time.before.relogin: "60000"
     src.consumer.group.id: "replicator-dev"

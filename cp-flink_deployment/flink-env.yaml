@@ -2,7 +2,7 @@ apiVersion: platform.confluent.io/v1beta1
 kind: FlinkEnvironment
 metadata:
   name: flink-env
-  namespace: confluent
+  namespace: flink
 spec:
   kubernetesNamespace: flink
   flinkApplicationDefaults:
@@ -14,5 +14,5 @@ spec:
         taskmanager.numberOfTaskSlots: "2"
         rest.profiling.enabled": "true"
   cmfRestClassRef:
-    name: default
-    namespace: confluent
+    name: cmfrestclass
+    namespace: flink
