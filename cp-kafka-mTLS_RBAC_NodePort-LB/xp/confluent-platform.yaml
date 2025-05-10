@@ -34,7 +34,7 @@ spec:
   replicas: 3
   podTemplate:
     annotations:
-      kafkacluster-manual-roll: 10
+      kafkacluster-manual-roll: "10"
     podSecurityContext:
       fsGroup: 1000
       runAsUser: 1000
@@ -89,7 +89,7 @@ spec:
       externalAccess:
         type: nodePort
         nodePort:
-          host: 98.70.146.223 # xp.com 
+          host: 98.70.146.223 # LB IP
           nodePortOffset: 32524
   authorization:
     type: rbac
@@ -135,7 +135,7 @@ spec:
         name: kraftcontroller
   podTemplate:
     annotations:
-        kafkacluster-manual-roll: 10
+        kafkacluster-manual-roll: "10"
     podSecurityContext:
       fsGroup: 1000
       runAsUser: 1000
