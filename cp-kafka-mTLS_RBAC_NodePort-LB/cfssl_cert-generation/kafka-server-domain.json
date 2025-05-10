@@ -1,16 +1,14 @@
 {
   "CN": "kafka",
   "hosts": [
-    <LB-IP>,
+    "<LB-IP>",
     "kafka",
     "kafka.xp.svc.cluster.local",
-    "kafka-0.kafka.xp.svc.cluster.local",
-    "kafka-1.kafka.xp.svc.cluster.local",
-    "kafka-2.kafka.xp.svc.cluster.local",
+    "*.kafka.xp.svc.cluster.local",
     "kraftcontroller.xp.svc.cluster.local",
-    "kraftcontroller-0.kraftcontroller.xp.svc.cluster.local",
-    "kraftcontroller-1.kraftcontroller.xp.svc.cluster.local",
-    "kraftcontroller-2.kraftcontroller.xp.svc.cluster.local"
+    "*.kraftcontroller.xp.svc.cluster.local",
+    "zookeeper.xp.svc.cluster.local",
+    "*.zookeeper.xp.svc.cluster.local"
   ],
   "key": {
     "algo": "rsa",
