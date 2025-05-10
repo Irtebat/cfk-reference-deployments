@@ -108,22 +108,23 @@ openssl s_client -connect kafka-2.kafka.xp.svc.cluster.local:8090 \
 
 * Step 1: Generate certs for external client
 
-  * Optione 1 : with CFSSL 
-cfssl gencert -ca=./utils/generated/cacerts.pem \
--ca-key=./utils/generated/rootCAkey.pem \
--config=./cfssl_cert-generation/ca-config.json \
--profile=server ./xp/client/client-domain.json | cfssljson -bare ./xp/client/certs/client
+  -  Optione 1 : with CFSSL 
+  ```
+  cfssl gencert -ca=./utils/generated/cacerts.pem \
+  -ca-key=./utils/generated/rootCAkey.pem \
+  -config=./cfssl_cert-generation/ca-config.json \
+  -profile=server ./xp/client/client-domain.json | cfssljson -bare ./xp/client/certs/client
+  ```
+  - Option 2: with cert-manager
 
-* Option 2: with cert-manager
-
-```
-k apply -f ./cert-manager_cert-generation/04-kafka-client-cert
-kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.crt}' | base64 -d > ./xp/client/certs/client.pem
-kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.key}' | base64 -d > ./xp/client/certs/client-key.pem
-kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.ca\.crt}' | base64 -d > ./utils/generated/cacerts.pem
-```
-
+  ```
+  k apply -f ./cert-manager_cert-generation/04-kafka-client-cert
+  kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.crt}' | base64 -d > ./xp/client/certs/client.pem
+  kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.key}' | base64 -d > ./xp/client/certs/client-key.pem
+  kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.ca\.crt}' | base64 -d > ./utils/generated/cacerts.pem
+  ```
 * Step 2: Create .p12 keystore
+
 ```
 openssl pkcs12 -export \
   -in ./xp/client/certs/client.pem \
@@ -135,7 +136,13 @@ openssl pkcs12 -export \
 ```
 * Step 3: Create JKS Truststore 
 ```
-keytool -import \
+keytool -delete \
+  -alias kafka-ca \
+  -keystore ./xp/client/store/truststore.jks \
+  -storepass changeit \
+  -noprompt 2>/dev/null || true
+  
+keytool -importcert \
   -alias kafka-ca \
   -file ./utils/generated/cacerts.pem \
   -keystore ./xp/client/store/truststore.jks \
@@ -158,6 +165,8 @@ openssl s_client \
   -servername <LB IP>
 
 ### Validate Commands:
+
+Note: Replace 98.70.146.223 below with LB IP
 
 * List topics
 ```
