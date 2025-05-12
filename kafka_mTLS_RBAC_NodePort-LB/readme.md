@@ -89,7 +89,7 @@ kubectl create secret generic mds-token \
 
 * Deploy Confluent Platform
 ```
-kubectl apply -f ./deployment/confluent-platform.yaml
+kubectl apply -f ./deployment/confluent-platform-kraft.yaml
 ```
 
 * Check Confluent Platform is deployed:
