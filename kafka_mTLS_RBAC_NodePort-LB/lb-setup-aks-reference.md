@@ -12,6 +12,7 @@ AKS Nodes via Advertised NodePort
     ↕
 Confluent Kafka Pods
 ```
+
 ---
 
 ## Prerequisites for reference
@@ -81,13 +82,27 @@ Assuming: AKS node pools are deployed using Virtual Machine Scale Sets
 You can associate the VMSS directly with an Azure Load Balancer's backend address pool as follows:
 ```bash
 az vmss update \
-  --resource-group <resource-group> \
+  --resource-group <vmss-resource-group> \
   --name <vmss-name> \
   --add virtualMachineProfile.networkProfile.networkInterfaceConfigurations[0].ipConfigurations[0].loadBalancerBackendAddressPools \
-    "[{'id':'/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.Network/loadBalancers/<lb-name>/backendAddressPools/<backend-pool-name>'}]"
-
+    id="/subscriptions/<subscription-id>/resourceGroups/<lb-resource-group>/providers/Microsoft.Network/loadBalancers/<lb-name>/backendAddressPools/<backend-pool-name>"
 ```
 *Note:* The Load Balancer must be in the same Virtual Network as the VMSS for backend pool association to work.
+
+Below command will upgrade the VMs and add them to backend pools.
+```bash
+  az vmss update-instances \
+  --resource-group <resource-group> \
+  --name <vmss-name> \
+  --instance-ids "*"
+```
+
+validate the NIC configuration 
+```bash
+az vmss nic list \
+  --resource-group <resource-group> \
+  --name <vmss-name> \
+```
 
 ---
 
