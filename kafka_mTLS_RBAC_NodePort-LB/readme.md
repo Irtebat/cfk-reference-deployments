@@ -89,7 +89,7 @@ kubectl create secret generic mds-token \
 
 * Deploy Confluent Platform
 ```
-kubectl apply -f ./xp/confluent-platform-kraft.yaml
+kubectl apply -f ./deployment/confluent-platform-kraft.yaml
 ```
 
 * Check Confluent Platform is deployed:
@@ -129,24 +129,24 @@ openssl s_client -connect kafka-2.kafka.xp.svc.cluster.local:8090 \
   cfssl gencert -ca=./utils/generated/cacerts.pem \
   -ca-key=./utils/generated/rootCAkey.pem \
   -config=./cfssl_cert-generation/ca-config.json \
-  -profile=server ./xp/client/client-domain.json | cfssljson -bare ./xp/client/certs/client
+  -profile=server ./deployment/client/client-domain.json | cfssljson -bare ./deployment/client/certs/client
   ```
   - Option 2: with cert-manager
 
   ```
   k apply -f ./cert-manager_cert-generation/04-kafka-client-cert
-  kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.crt}' | base64 -d > ./xp/client/certs/client.pem
-  kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.key}' | base64 -d > ./xp/client/certs/client-key.pem
+  kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.crt}' | base64 -d > ./deployment/client/certs/client.pem
+  kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.key}' | base64 -d > ./deployment/client/certs/client-key.pem
   kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.ca\.crt}' | base64 -d > ./utils/generated/cacerts.pem
   ```
 * Step 2: Create .p12 keystore
 
 ```
 openssl pkcs12 -export \
-  -in ./xp/client/certs/client.pem \
-  -inkey ./xp/client/certs/client-key.pem \
+  -in ./deployment/client/certs/client.pem \
+  -inkey ./deployment/client/certs/client-key.pem \
   -certfile ./utils/generated/cacerts.pem \
-  -out ./xp/client/store/keystore.p12 \
+  -out ./deployment/client/store/keystore.p12 \
   -name kafka-keystore \
   -passout pass:changeit
 ```
@@ -154,29 +154,29 @@ openssl pkcs12 -export \
 ```
 keytool -delete \
   -alias kafka-ca \
-  -keystore ./xp/client/store/truststore.jks \
+  -keystore ./deployment/client/store/truststore.jks \
   -storepass changeit \
   -noprompt 2>/dev/null || true
   
 keytool -importcert \
   -alias kafka-ca \
   -file ./utils/generated/cacerts.pem \
-  -keystore ./xp/client/store/truststore.jks \
+  -keystore ./deployment/client/store/truststore.jks \
   -storepass changeit \
   -noprompt
 ```
 * Create ConfluentRoleBinding for your client. 
 ```
-k apply -f xp/client/ClusterAdmin-rb.yaml
-k apply -f xp/client/ResourceOwner-rb.yaml
-k apply -f xp/client/DeveloperRead-cg-rb.yaml
+k apply -f deployment/client/ClusterAdmin-rb.yaml
+k apply -f deployment/client/ResourceOwner-rb.yaml
+k apply -f deployment/client/DeveloperRead-cg-rb.yaml
 ```
 
 ### Validate SSL handshake
 openssl s_client \
   -connect <LB IP>:32524 \
-  -cert ./xp/client/certs/client.pem \
-  -key ./xp/client/certs/client-key.pem \
+  -cert ./deployment/client/certs/client.pem \
+  -key ./deployment/client/certs/client-key.pem \
   -CAfile ./utils/generated/cacerts.pem \
   -servername <LB IP>
 
@@ -188,14 +188,14 @@ Note: Replace 98.70.146.223 below with LB IP
 ```
 kafka-topics   \
   --bootstrap-server 98.70.146.223:32524 \
-  --command-config ./xp/client/client.properties \
+  --command-config ./deployment/client/client.properties \
   --list
 ```
 * Create Topic
 ```
 kafka-topics \
   --bootstrap-server 98.70.146.223:32524 \
-  --command-config ./xp/client/client.properties \
+  --command-config ./deployment/client/client.properties \
   --create \
   --topic test-topic \
   --partitions 3 \
@@ -205,14 +205,14 @@ kafka-topics \
 ```
 kafka-console-producer \
   --bootstrap-server 98.70.146.223:32524 \
-  --producer.config ./xp/client/client.properties \
+  --producer.config ./deployment/client/client.properties \
   --topic test-topic
 ```
 * Consume Messages
 ```
 kafka-console-consumer \
   --bootstrap-server 98.70.146.223:32524 \
-  --consumer.config ./xp/client/client.properties \
+  --consumer.config ./deployment/client/client.properties \
   --topic test-topic \
   --from-beginning
 ```
@@ -221,7 +221,7 @@ kafka-console-consumer \
 
 ```
 kubectl delete confluentrolebinding --all -n xp
-kubectl delete -f ./xp/confluent-platform-kraft.yaml -n xp
+kubectl delete -f ./deployment/confluent-platform-kraft.yaml -n xp
 kubectl delete secret mds-token root-ca-secret tls-kafka tls-kafka-client --namespace xp
 helm uninstall operator -n xp
 ```
