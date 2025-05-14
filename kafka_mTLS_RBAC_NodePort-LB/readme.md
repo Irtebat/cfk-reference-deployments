@@ -221,7 +221,7 @@ kafka-console-consumer \
 
 ```
 kubectl delete confluentrolebinding --all -n xp
-kubectl delete -f ./xp/confluent-platform.yaml -n xp
+kubectl delete -f ./xp/confluent-platform-kraft.yaml -n xp
 kubectl delete secret mds-token root-ca-secret tls-kafka tls-kafka-client --namespace xp
 helm uninstall operator -n xp
 ```
