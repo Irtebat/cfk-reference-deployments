@@ -173,16 +173,19 @@ k apply -f deployment/client/DeveloperRead-cg-rb.yaml
 ```
 
 ### Validate SSL handshake
+
+```
 openssl s_client \
-  -connect <LB IP>:32524 \
+  -connect <LB_IP>:<Advertised_Port> \
   -cert ./deployment/client/certs/client.pem \
   -key ./deployment/client/certs/client-key.pem \
   -CAfile ./utils/generated/cacerts.pem \
-  -servername <LB IP>
+  -servername <LB_IP>
+```
 
 ### Validate Commands:
 
-Note: Replace 98.70.146.223 below with LB IP
+Note: Replace 98.70.146.223:32524 below with LB IP and Advertised kafka Port
 
 * List topics
 ```
