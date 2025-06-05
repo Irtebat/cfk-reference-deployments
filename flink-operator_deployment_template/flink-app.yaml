@@ -9,16 +9,28 @@ spec:
   flinkVersion: v1_19
   serviceAccount: flink
   flinkConfiguration:
-    # metrics.reporter.prom.factory.class: "org.apache.flink.metrics.prometheus.PrometheusReporterFactory"
-    # metrics.reporter.prom.port": "9249"
-    rest.profiling.enabled: "true"
     
-    #fs.azure.enabled: "true"
-    #state.checkpoints.dir: "wasbs://<container>@<storage-account>.blob.core.windows.net/checkpoint/"
-    #fs.azure.account.key.<storage-account>.blob.core.windows.net: "<azure-access-key>"
+    
+    metrics.reporter.prom.factory.class: "org.apache.flink.metrics.prometheus.PrometheusReporterFactory"
+    metrics.reporter.prom.port": "9249"
+    rest.profiling.enabled: "true"
+
+    metrics.latency.interval: "1000"
+
+    state.backend.latency-track.keyed-state-enabled : "true"
+    #state.backend.latency-track.sample-interval: "100"
+    #state.backend.latency-track.history-size: "128"
+    
+
+    fs.azure.enabled: "true"
+    state.checkpoints.num-retained: "1"   
+    state.savepoint.dir: "wasbs://<container>@<storage-account>.blob.core.windows.net/<checkpoint-dir>/"
+    state.checkpoints.dir: "wasbs://<container>@<storage-account>.blob.core.windows.net/<checkpoint-dir>/"
+    fs.azure.account.key.<storage-account>.blob.core.windows.net: "<azure-access-key>"
     fs.azure.write.request.size: "4194304"          
     fs.azure.read.request.size: "4194304"           
-    execution.checkpointing.interval: "60000"      
+    execution.checkpointing.interval: "60000"   
+    
     execution.checkpointing.timeout: "300000"       
     execution.checkpointing.max-concurrent-checkpoints: "1" 
 
@@ -29,12 +41,12 @@ spec:
     state.backend.rocksdb.memory.managed: "true"
     #taskmanager.memory.managed.size: ""
     #taskmanager.memory.task.heap.size: ""
-
     #state.backend.rocksdb.block.blocksize: ""
     #state.backend.rocksdb.writebuffer.size: ""
     #state.backend.rocksdb.writebuffer.count: ""
     #state.backend.rocksdb.compaction.style: ""
     #state.backend.rocksdb.compression.type: ""
+    #state.backend.rocksdb.thread.num: ""
 
     # taskmanager.numberOfTaskSlots: "8"
     parallelism.default: "6"
@@ -64,7 +76,7 @@ spec:
       memory: 1048m
       cpu: 1
   taskManager:
-    replicas: 3
+    replicas: 2
     podTemplate:
       spec:
         volumes:
@@ -81,7 +93,7 @@ spec:
   job:
     # Built-in-example
     jarURI: local:///opt/flink/usrlib/application.jar
-    entryClass: irtebat.flink.apps.DatagenToKafkaTransformationJob
+    entryClass: irtebat.flink.apps.DatagenToKafkaJoinJob
     state: running
     parallelism: 3
     upgradeMode: last-state

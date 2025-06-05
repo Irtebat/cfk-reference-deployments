@@ -397,3 +397,13 @@ kubectl delete -f confluent-platform.yaml
 kubectl delete -f storage-class.yaml
 helm uninstall confluent-operator -n confluent
 ```
+## Misc
+
+**Validate metrics**
+
+Create a pod for querying the exposed metrics**
+```bash
+kubectl run test-shell   --rm -i -t   --image=praqma/network-multitool   --restart=Never   --namespace=flink   --command -- sh
+```
+
+Run the script "./validate-metrics.sh"

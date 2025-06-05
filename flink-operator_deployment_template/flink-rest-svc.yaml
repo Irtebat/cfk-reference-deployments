@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: flink-app
+    type: flink-native-kubernetes
+  name: flink-app-rest-lb
+  namespace: flink
+  ownerReferences:
+spec:
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: rest
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
+  selector:
+    app: flink-app
+    component: jobmanager
+    type: flink-native-kubernetes
+  sessionAffinity: None
+  type: LoadBalancer
