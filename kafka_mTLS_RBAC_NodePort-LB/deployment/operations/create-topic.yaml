@@ -1,0 +1,18 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: KafkaTopic
+metadata:
+  name: topic-a
+  namespace: xp
+spec:
+  replicas: 1
+  partitionCount: 12
+  configs:
+    cleanup.policy: "compact"
+  kafkaClusterRef:
+    name: kafka
+  kafkaRest:
+    authentication:
+      type: mtls
+      sslClientAuthentication: true
+    tls:
+      secretRef: tls-kafka
