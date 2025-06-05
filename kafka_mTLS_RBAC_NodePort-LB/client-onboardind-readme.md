@@ -6,13 +6,12 @@ This guide helps onboard external Kafka clients to a secured Confluent Platform 
 4.	Configure client properties and validate SSL and Kafka commands
 
 *Assumption* The Confluent Platform is already deployed with:
-- TLS + mTLS enabled
-- Access exposed via NodePort behind a LoadBalancer
-- RBAC enabled via MDS token service and signed token keypair
+- Authentication: TLS + mTLS enabled
+- Authorization: RBAC
+- Client Network AccessL Access exposed via NodePort behind a LoadBalancer
 
 ### Generate Client TLS Certificate (via cert-manager)
 Use as reference , the client certificate manifest:
-
 ```
 kubectl apply -f ./cert-manager_cert-generation/04-kafka-client-cert.yaml
 ```

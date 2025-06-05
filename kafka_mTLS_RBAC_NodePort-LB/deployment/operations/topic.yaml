@@ -7,7 +7,11 @@ spec:
   replicas: 1
   partitionCount: 12
   configs:
-    cleanup.policy: "compact"
+    cleanup.policy: "delete"
+    retention.ms: "604800000"
+    segment.bytes: "1073741824"
+    segment.ms: "604800000"
+    compression.type: "producer"
   kafkaClusterRef:
     name: kafka
   kafkaRest:
