@@ -3,7 +3,7 @@ This guide helps onboard external Kafka clients to a secured Confluent Platform 
 1. 	Generate certs with cert-manager
 2. 	Create keystore & truststore
 3. 	Apply appropriate RBAC role bindings
-4	Configure client properties and validate SSL and Kafka commands
+4.	Configure client properties and validate SSL and Kafka commands
 
 *Assumption* The Confluent Platform is already deployed with:
 - TLS + mTLS enabled
