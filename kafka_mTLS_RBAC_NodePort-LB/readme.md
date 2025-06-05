@@ -124,21 +124,25 @@ openssl s_client -connect kafka-2.kafka.xp.svc.cluster.local:8090 \
 
 * Step 1: Generate certs for external client
 
-  -  Optione 1 : with CFSSL 
+  Option 1 : with CFSSL 
+  
   ```
   cfssl gencert -ca=./utils/generated/cacerts.pem \
   -ca-key=./utils/generated/rootCAkey.pem \
   -config=./cfssl_cert-generation/ca-config.json \
   -profile=server ./deployment/client/client-domain.json | cfssljson -bare ./deployment/client/certs/client
   ```
-  - Option 2: with cert-manager
+  Option 2: with cert-manager
 
   ```
-  k apply -f ./cert-manager_cert-generation/04-kafka-client-cert
+  k apply -f ./cert-manager_cert-generation/04-kafka-client-cert.yaml
   kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.crt}' | base64 -d > ./deployment/client/certs/client.pem
   kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.key}' | base64 -d > ./deployment/client/certs/client-key.pem
+  mkdir ./utils/generated
   kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.ca\.crt}' | base64 -d > ./utils/generated/cacerts.pem
   ```
+Note: Confluent Platform components and client certificates should be signed by the same Certificate Authority. 
+
 * Step 2: Create .p12 keystore
 
 ```

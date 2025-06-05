@@ -90,7 +90,7 @@ spec:
         type: nodePort
         nodePort:
           host: 98.70.146.223 # LB IP
-          nodePortOffset: 32524
+          nodePortOffset: 32525
   authorization:
     type: rbac
     superUsers:

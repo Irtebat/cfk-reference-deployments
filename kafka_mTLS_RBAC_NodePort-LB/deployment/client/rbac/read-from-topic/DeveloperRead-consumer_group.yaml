@@ -9,6 +9,6 @@ spec:
     name: kafkaclient
   role: DeveloperRead
   resourcePatterns:
-    - name: console-consumer
+    - name: console-consumer # <group-id>
       resourceType: Group
       patternType: PREFIXED

@@ -9,7 +9,6 @@ spec:
   renewBefore: 720h
   commonName: kafkaclient
   dnsNames:
-    - xp.com
     - kafkaclient
   subject:
     organizations:

@@ -10,7 +10,4 @@ spec:
     type: user
     name: kafkaclient
   role: ClusterAdmin
-  ## Below config is default
-  #kafkaRestClassRef:
-  # name: default
 ---
