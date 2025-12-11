@@ -381,14 +381,15 @@ Create DNS records for Kafka brokers using the ingress controller load balancer 
 
 Add DNS records for the Kafka brokers, Connect, Schema Registry, Control Center using the IP address.
 
-
-kafka.<DOMAIN>:The EXTERNAL-IP value of the ingress load balancer service
-b0.<DOMAIN>:The EXTERNAL-IP value of the ingress load balancer service
-b1.<DOMAIN>:The EXTERNAL-IP value of the ingress load balancer service
-b2.<DOMAIN>:The EXTERNAL-IP value of the ingress load balancer service
-connect.<DOMAIN>:The EXTERNAL-IP value of the ingress load balancer service
-schemaregistry.<DOMAIN>:The EXTERNAL-IP value of the ingress load balancer service
-controlcenter.<DOMAIN>:The EXTERNAL-IP value of the ingress load balancer service
+```
+kafka.<DOMAIN> : The EXTERNAL-IP value of the ingress load balancer service
+b0.<DOMAIN> : The EXTERNAL-IP value of the ingress load balancer service
+b1.<DOMAIN> : The EXTERNAL-IP value of the ingress load balancer service
+b2.<DOMAIN> : The EXTERNAL-IP value of the ingress load balancer service
+connect.<DOMAIN> : The EXTERNAL-IP value of the ingress load balancer service
+schemaregistry.<DOMAIN> : The EXTERNAL-IP value of the ingress load balancer service
+controlcenter.<DOMAIN> : The EXTERNAL-IP value of the ingress load balancer service
+```
 ---
 
 ## Step 10: Generate Kafka Client Truststore
