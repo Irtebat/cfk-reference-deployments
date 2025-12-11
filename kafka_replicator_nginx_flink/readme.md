@@ -346,7 +346,7 @@ kubectl apply -f ./svc/sr-bootstrap-service.yaml
 
 **Deploy Ingress Controller**
 
-Add the Kubernetes NginX Helm repo and update the repo.
+Add the Kubernetes Nginx Helm repo and update the repo.
 
 ```bash
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx

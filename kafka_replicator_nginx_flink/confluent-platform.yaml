@@ -99,11 +99,6 @@ spec:
     init: docker.io/confluentinc/confluent-init-container:3.1.0
   tls:
     secretRef: tls-group
-  externalAccess:
-    type: nodePort
-    nodePort:
-      host: "<NODEIP/HOST>"
-      nodePortOffset: 30020
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
