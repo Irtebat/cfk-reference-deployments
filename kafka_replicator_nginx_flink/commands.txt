@@ -1,0 +1,39 @@
+k exec -it kafka-0 -n confluent -- bash
+
+
+kafka-topics --bootstrap-server kafka.confluent.svc.cluster.local:9071 --delete --topic flink-demo-sink-topic
+
+kafka-topics --bootstrap-server kafka.confluent.svc.cluster.local:9071 --delete --topic flink-demo-source-A
+
+kafka-topics --bootstrap-server kafka.confluent.svc.cluster.local:9071 --delete --topic flink-demo-source-B
+
+kafka-topics --bootstrap-server kafka.confluent.svc.cluster.local:9071 --delete --topic flink-demo-.*
+
+kafka-topics --bootstrap-server kafka.confluent.svc.cluster.local:9071 --list
+
+kafka-topics --bootstrap-server kafka.confluent.svc.cluster.local:9071 --create \
+--topic flink-demo-sink-topic \
+--partitions 3 \
+--replication-factor 2 \
+--config retention.ms=600000 \
+--config segment.ms=60000
+
+kafka-topics --bootstrap-server kafka.confluent.svc.cluster.local:9071 --create \
+--topic flink-demo-source-A \
+--partitions 3 \
+--replication-factor 2 \
+--config retention.ms=600000 \
+--config segment.ms=60000
+
+kafka-topics --bootstrap-server kafka.confluent.svc.cluster.local:9071 --create \
+--topic flink-demo-source-B \
+--partitions 3 \
+--replication-factor 2 \
+--config retention.ms=600000 \
+--config segment.ms=60000
+
+helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace flink \
+  --set nodeExporter.enabled=false
+
+http://98.70.147.120/jobs/25e2f6df72ec47464856fa1ca11f06ed/vertices/a5ea5bd154a10f83149705705bd27b14/subtasks/0/metrics

@@ -1,0 +1,10 @@
+operatorPod:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "app-confluent"
+            operator: In
+            values:
+            - "cmfoperator"

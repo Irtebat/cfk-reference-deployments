@@ -1,0 +1,32 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: replicator
+  namespace: confluent
+spec:
+  name: replicator
+  class: "io.confluent.connect.replicator.ReplicatorSourceConnector"
+  taskMax: 4
+  configs:
+    topic.regex: (?!confluent\.|connect\.|_consumer_offsets|_schemas$).*
+    confluent.topic.replication.factor: "3"
+    # Dest: Kafka in same CFK cluster (internal access)
+    dest.kafka.bootstrap.servers: "kafka.confluent.svc.cluster.local:9071"
+    dest.kafka.security.protocol: "PLAINTEXT"
+    key.converter: "io.confluent.connect.replicator.util.ByteArrayConverter"
+    value.converter: "io.confluent.connect.replicator.util.ByteArrayConverter"
+    # Src: Kerberos-secured Central Kafka cluster 
+    src.kafka.bootstrap.servers: ""
+    src.kafka.security.protocol: "SASL_PLAINTEXT" 
+    src.kafka.sasl.mechanism: "GSSAPI"
+    src.kafka.sasl.kerberos.service.name: "kafka"
+    src.kafka.sasl.jaas.config: |
+      com.sun.security.auth.module.Krb5LoginModule required
+      useKeyTab=true
+      storeKey=true
+      keyTab="/mnt/kerberos/replicator-keytab/replicator.keytab"
+      principal="replicator@EXAMPLE.COM";
+    src.consumer.auto.offset.reset: "earliest"
+    src.kafka.sasl.kerberos.kinit.cmd: "/usr/bin/kinit"
+    src.kafka.kerberos.min.time.before.relogin: "60000"
+    src.consumer.group.id: "replicator-dev"

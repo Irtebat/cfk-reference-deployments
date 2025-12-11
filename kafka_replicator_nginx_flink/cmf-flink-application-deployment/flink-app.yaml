@@ -1,0 +1,108 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: FlinkApplication
+metadata:
+  name: flink-app
+  namespace: flink
+spec:
+  flinkEnvironment: flink
+  image: confluentinc/cp-flink:1.19.1-cp2
+  flinkVersion: v1_19
+  serviceAccount: flink
+  flinkConfiguration:
+    
+    
+    metrics.reporter.prom.factory.class: "org.apache.flink.metrics.prometheus.PrometheusReporterFactory"
+    metrics.reporter.prom.port": "9249"
+    
+    rest.profiling.enabled: "true"
+
+    metrics.latency.interval: "1000"
+
+    state.backend.latency-track.keyed-state-enabled : "true"
+    #state.backend.latency-track.sample-interval: "100"
+    #state.backend.latency-track.history-size: "128"
+
+    fs.azure.enabled: "true"
+    state.checkpoints.num-retained: "1"   
+    state.savepoints.dir: "wasbs://<container>@<storage-account>.blob.core.windows.net/<checkpoint-dir>/"
+    state.checkpoints.dir: "wasbs://<container>@<storage-account>.blob.core.windows.net/<checkpoint-dir>/"
+    
+    # kubernetes.cluster-id: <cluster-id>
+    # high-availability.type: kubernetes
+    # high-availability.storageDir: "wasbs://<container>@<storage-account>.blob.core.windows.net/<checkpoint-dir>/"
+    
+    fs.azure.account.key.<storage-account>.blob.core.windows.net: "<azure-access-key>"
+    fs.azure.write.request.size: "4194304"          
+    fs.azure.read.request.size: "4194304"           
+    execution.checkpointing.interval: "60000"   
+    
+    execution.checkpointing.timeout: "300000"       
+    execution.checkpointing.max-concurrent-checkpoints: "1" 
+
+    state.backend: rocksdb
+    state.backend.incremental: "true"
+    state.backend.rocksdb.localdir: /localstatedir
+
+    state.backend.rocksdb.memory.managed: "true"
+    state.backend.rocksdb.block.blocksize: "64kb"
+    state.backend.rocksdb.writebuffer.size: "64mb"   
+    state.backend.rocksdb.writebuffer.count: "4"
+    state.backend.rocksdb.compaction.style: "universal"
+    state.backend.rocksdb.compression.type: "lz4"    
+    state.backend.rocksdb.thread.num: "8"   
+    taskmanager.numberOfTaskSlots: "2"
+    parallelism.default: "6"
+
+  podTemplate:
+    spec:
+      ports:
+          - name: prometheus
+            containerPort: 9249
+      containers:
+          - name: flink-main-container
+            env:
+              - name: ENABLE_BUILT_IN_PLUGINS
+                value: "flink-azure-fs-hadoop-1.19.1-cp2.jar"
+              - name: KAFKA_BOOTSTRAP_SERVERS
+                value: "kafka.confluent.svc.cluster.local:9071"
+              - name: KAFKA_SECURITY_PROTOCOL
+                value: "PLAINTEXT"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: app-confluent
+                    operator: In
+                    values:
+                      - flink
+  jobManager:
+    replicas: 2
+    resource:
+      memory: 1048m
+      cpu: 1
+  taskManager:
+    replicas: 3
+    resource:
+      memory: 128G
+      cpu: 16
+    podTemplate:
+      spec:
+        volumes:
+          - name: rocksdb-storage
+            emptyDir: {}
+        containers:
+          - name: flink-main-container
+            volumeMounts:
+              - name: rocksdb-storage
+                mountPath: /localstatedir
+  job:
+    # Built-in-example
+    jarURI: local:///opt/flink/usrlib/application.jar
+    entryClass: irtebat.flink.apps.DatagenToKafkaJoinJob
+    state: running
+    parallelism: 3
+    upgradeMode: last-state
+  cmfRestClassRef:
+    name: cmfrestclass
+    namespace: flink
