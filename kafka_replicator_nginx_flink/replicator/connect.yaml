@@ -8,7 +8,7 @@ spec:
   oneReplicaPerNode: true
   image:
     application: docker.io/<repo>/<custom-image>
-    init: docker.io/confluentinc/confluent-init-container:2.11.0
+    init: docker.io/confluentinc/confluent-init-container:3.1.0
   tls:
     secretRef: tls-group
   podTemplate:
@@ -39,7 +39,7 @@ spec:
         timeoutSeconds: 100
     envVars:
       - name: CLASSPATH
-        value: /usr/share/confluent-hub-components/confluentinc-kafka-connect-replicator/lib/replicator-rest-extension-7.8.1.jar
+        value: /usr/share/confluent-hub-components/confluentinc-kafka-connect-replicator/lib/replicator-rest-extension-8.0.2.jar
   dependencies:
     kafka:
       bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071

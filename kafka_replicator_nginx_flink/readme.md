@@ -1,12 +1,27 @@
 # Deploy Confluent Platform + Flink using CFK and CMF
 
-This guide walks through the setup of Confluent Platform and Apache Flink using CFK in an airgapped installation. As reference, the deployment is done on Azure Kubernetes Service. It covers infrastructure provisioning, platform deployment, validation, and teardown.
+This guide provides a comprehensive walkthrough for deploying **Confluent Platform** and **Apache Flink** in an air-gapped Kubernetes environment using **Confluent for Kubernetes (CFK)** and **Confluent Manager for Flink (CMF)**. The reference implementation targets **Azure Kubernetes Service (AKS)**.
 
-It contains steps to deploy replicator to read data from kerberized Kafka cluster.
+## What's Covered
 
-It contains instructions on packaging a flink application
+| Topic | Description |
+|-------|-------------|
+| **Infrastructure Setup** | Provisioning AKS cluster with dedicated node pools for each component |
+| **Confluent Platform** | Deploying Kafka (KRaft mode), Schema Registry, Connect, and Control Center |
+| **TLS & Security** | Generating self-signed certificates and configuring encrypted communication |
+| **Ingress Configuration** | Setting up NGINX ingress with SSL passthrough for external access |
+| **Replicator** | Connecting to a Kerberized source Kafka cluster for cross-cluster replication |
+| **Flink Deployment** | Installing Flink Kubernetes Operator and CMF for stream processing workloads |
+| **Flink Applications** | Packaging and deploying Flink applications via CMF |
 
-It conta
+## Prerequisites
+
+- Azure CLI with an active subscription
+- `kubectl` configured for cluster access
+- Helm 3.x installed
+- Docker (for building custom images)
+- Access to container registry (or internal mirror for air-gapped setup)
+- Shared artefacts on a bastion node (Helm Charts)
 
 ---
 
@@ -276,7 +291,12 @@ kubectl config set-context --current --namespace confluent
 
 helm repo add confluentinc https://packages.confluent.io/helm
 
-helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes --namespace confluent -f ./operator_values/cfk-operator_values.yaml --set enableCMFDay2Ops=true --set namespaced=false
+helm upgrade --install confluent-operator confluentinc/confluent-for-kubernetes \
+  --version 3.1.0 \
+  --namespace confluent \
+  -f ./operator_values/cfk-operator_values.yaml \
+  --set enableCMFDay2Ops=true \
+  --set namespaced=false
 ```
 
 Check that the operator pod is running:
@@ -471,14 +491,17 @@ kubectl create namespace flink
 ```bash
 kubectl create -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
 
-helm upgrade --install cp-flink-kubernetes-operator confluentinc/flink-kubernetes-operator -n flink -f ./operator_values/flink-operator_values.yaml
+helm upgrade --install cp-flink-kubernetes-operator confluentinc/flink-kubernetes-operator \
+  --version 1.12.1-cp1 \
+  -n flink \
+  -f ./operator_values/flink-operator_values.yaml
 ```
 ***Customizing Flink CMF Helm Chart with Node Placement Rules***
 This customization introduces targeted scheduling rules for the Confluent Manager for Flink by modifying the Helm chart.
 
 1. Pull and extract the helm chart for confluent-manager-for-apache-flink:
 ```bash
-helm pull confluentinc/confluent-manager-for-apache-flink
+helm pull confluentinc/confluent-manager-for-apache-flink --version 2.0.2
 tar xvf ...
 ```
 
@@ -497,7 +520,10 @@ tar xvf ...
 ```
 3. Install the operator
 ```bash
-helm upgrade --install cmf confluentinc/confluent-manager-for-apache-flink --namespace flink -f ./operator_values/cmf-operator_values.yaml
+helm upgrade --install cmf confluentinc/confluent-manager-for-apache-flink \
+  --version 2.0.2 \
+  --namespace flink \
+  -f ./operator_values/cmf-operator_values.yaml
 ```
 Verify the operator pods are running
 ```bash
