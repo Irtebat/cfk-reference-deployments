@@ -1,0 +1,15 @@
+controller:
+  image:
+    repository: <>/ingress-nginx/controller
+    tag: <>
+
+  admissionWebhooks:
+    patch:
+      image:
+        repository: <>/ingress-nginx/kube-webhook-certgen
+        tag: <>
+
+    job:
+      image:
+        repository: <>/ingress-nginx/kube-webhook-certgen
+        tag: 

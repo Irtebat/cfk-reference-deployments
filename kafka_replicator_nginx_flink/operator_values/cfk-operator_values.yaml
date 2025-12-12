@@ -7,3 +7,11 @@ affinity:
          operator: In
          values:
          - "cfkoperator"
+
+imagePullSecretRef: <>
+
+image:
+  registry: <>:<>   # your local registry host[:port]
+  repository: confluentinc/confluent-operator  
+  pullPolicy: IfNotPresent
+  tag: "0.1351.24"                               

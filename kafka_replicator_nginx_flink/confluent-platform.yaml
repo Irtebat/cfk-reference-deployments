@@ -164,4 +164,15 @@ spec:
     connect:
       - name: connect
         url: http://connect.confluent.svc.cluster.local:8083
+    prometheusClient:
+      url: http://controlcenter-next-gen.confluent.svc.cluster.local:9090
+    alertManagerClient:
+      url: http://controlcenter-next-gen.confluent.svc.cluster.local:9093
+  services:
+    prometheus:
+      image: <>:<>/confluentinc/cp-enterprise-prometheus:2.3.0
+      pvc:
+        dataVolumeCapacity: 100Gi
+    alertmanager:
+      image: <>:<>/confluentinc/cp-enterprise-alertmanager:2.3.0
 ---

@@ -360,6 +360,7 @@ helm repo update
 helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
   --set controller.extraArgs.enable-ssl-passthrough="true" \
   --namespace confluent
+  -f ./operator_values/helm_values.yaml
 ```
 
 Note:
