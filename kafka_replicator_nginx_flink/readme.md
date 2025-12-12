@@ -313,6 +313,7 @@ Prepare the configuration:
 
 - Replace placeholders in `confluent-platform.yaml`
 - Apply required storage class (optional)
+- Update manifest files as needed to configure image pulls from Jio's custom Docker registry. For guidance, see: https://docs.confluent.io/operator/current/co-custom-registry.html
 
 ```bash
 kubectl apply -f storage-class.yaml

@@ -32,8 +32,8 @@ spec:
     # high-availability.storageDir: "wasbs://<container>@<storage-account>.blob.core.windows.net/<checkpoint-dir>/"
     
     fs.azure.account.key.<storage-account>.blob.core.windows.net: "<azure-access-key>"
-    fs.azure.write.request.size: "4194304"          
-    fs.azure.read.request.size: "4194304"           
+    # fs.azure.write.request.size: "4194304"          
+    # fs.azure.read.request.size: "4194304"           
     execution.checkpointing.interval: "60000"   
     
     execution.checkpointing.timeout: "300000"       
@@ -43,10 +43,10 @@ spec:
     state.backend.incremental: "true"
     state.backend.rocksdb.localdir: /localstatedir
 
-    state.backend.rocksdb.memory.managed: "true"
-    state.backend.rocksdb.block.blocksize: "64kb"
-    state.backend.rocksdb.writebuffer.size: "64mb"   
-    state.backend.rocksdb.writebuffer.count: "4"
+    # state.backend.rocksdb.memory.managed: "true"
+    # state.backend.rocksdb.block.blocksize: "64kb"
+    # state.backend.rocksdb.writebuffer.size: "64mb"   
+    # state.backend.rocksdb.writebuffer.count: "4"
     state.backend.rocksdb.compaction.style: "universal"
     state.backend.rocksdb.compression.type: "lz4"    
     state.backend.rocksdb.thread.num: "8"   
@@ -77,12 +77,12 @@ spec:
                     values:
                       - flink
   jobManager:
-    replicas: 2
+    replicas: 1
     resource:
       memory: 1048m
       cpu: 1
   taskManager:
-    replicas: 3
+    replicas: 3 # Validate with Flink DSK team
     resource:
       memory: 128G
       cpu: 16

@@ -130,7 +130,7 @@ spec:
   replicas: 1
   oneReplicaPerNode: true
   image:
-    application: docker.io/confluentinc/cp-enterprise-control-center:8.0.2
+    application: docker.io/confluentinc/cp-enterprise-control-center-next-gen:latest-ubi9
     init: docker.io/confluentinc/confluent-init-container:3.1.0
   dataVolumeCapacity: 300Gi
   storageClass:
