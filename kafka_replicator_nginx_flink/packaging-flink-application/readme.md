@@ -1,6 +1,5 @@
 # Packaging a flink Application
 
-
 ## Step 1 : Package your Flink application
 Refer to the pom.xml file in this directory as a reference. It is configured for developing Flink applications using the Table API and SQL, and supports local testing within IntelliJ IDEA.
 
