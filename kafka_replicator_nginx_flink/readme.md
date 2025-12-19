@@ -58,6 +58,12 @@ az aks create \
   --no-wait \
   --enable-private-cluster
 ```
+NOTE: Add the following two flags only if you want to deploy the AKS cluster into a specific VNet and subnet.
+
+```bash
+--network-plugin azure \
+--vnet-subnet-id /subscriptions/{sub-id}/resourceGroups/{vnet-rg}/providers/Microsoft.Network/virtualNetworks/{vnet-name}/subnets/{subnet-name} \
+```
 
 ---
 
