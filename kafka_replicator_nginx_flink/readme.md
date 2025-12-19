@@ -53,7 +53,7 @@ az aks create \
   --enable-cluster-autoscaler \
   --min-count 1 \
   --max-count 2 \
-  --kubernetes-version 1.31.6 \
+  --kubernetes-version 1.32.9 \
   --nodepool-taints CriticalAddonsOnly=true:NoSchedule \
   --no-wait \
   --enable-private-cluster
