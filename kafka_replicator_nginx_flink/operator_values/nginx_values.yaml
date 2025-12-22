@@ -12,4 +12,35 @@ controller:
     job:
       image:
         repository: <>/ingress-nginx/kube-webhook-certgen
-        tag: 
+        tag: <>
+    extraArgs:
+    enable-ssl-passthrough: "true"
+
+  # Schedule only on ingress nodepool
+  nodeSelector:
+    app-confluent: ingress
+
+  tolerations:
+    - key: "ingress"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+      
+  service:
+    type: LoadBalancer
+    externalTrafficPolicy: Local
+    loadBalancerIP=10.x.x.x
+
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-health-probe-protocol: TCP
+      service.beta.kubernetes.io/azure-load-balancer-health-probe-port: "10254"
+
+    ports:
+      http: 80
+      https: 443
+      healthcheck: 10254
+
+  containerPorts:
+    http: 80
+    https: 443
+    healthcheck: 10254
