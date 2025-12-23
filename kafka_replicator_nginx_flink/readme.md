@@ -182,6 +182,21 @@ az aks nodepool add \
   --no-wait
 ```
 
+**Create Nginx Ingress node pool:**
+```bash 
+az aks nodepool add \
+  --resource-group {rg-group} \
+  --cluster-name {aks-cluster-name}  \
+  --name ingress \
+  --node-count 1 \
+  --node-vm-size Standard_D8as_v5 \
+  --enable-cluster-autoscaler \
+  --min-count 1 \
+  --max-count 3 \
+  --labels app-confluent=ingress \
+  --no-wait
+```
+
 **Flink Kubernetes Operator node pool:**
 ```bash
 az aks nodepool add \
