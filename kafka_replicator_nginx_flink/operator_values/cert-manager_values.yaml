@@ -1,33 +1,30 @@
 installCRDs: true
 
 global:
-  imagePullSecrets: <>
+  imagePullSecrets: <your-image-pull-secret>
 
 image:
   repository: <your-registry>/jetstack/cert-manager-controller
-  tag: v1.8.2
+  tag: v1.18.2
   pullPolicy: IfNotPresent
 
 webhook:
   image:
     repository: <your-registry>/jetstack/cert-manager-webhook
-    tag: v1.8.2
+    tag: v1.18.2
     pullPolicy: IfNotPresent
 
 cainjector:
   image:
     repository: <your-registry>/jetstack/cert-manager-cainjector
-    tag: v1.8.2
+    tag: v1.18.2
     pullPolicy: IfNotPresent
 
 startupapicheck:
   image:
     repository: <your-registry>/jetstack/cert-manager-startupapicheck
-    tag: v1.8.2
+    tag: v1.18.2
     pullPolicy: IfNotPresent
-
-imagePullSecrets:
-  - name: <your-image-pull-secret>
 
 resources:
   requests:
