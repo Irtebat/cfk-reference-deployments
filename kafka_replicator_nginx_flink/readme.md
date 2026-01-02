@@ -513,6 +513,17 @@ kubectl create namespace flink
 ```
 **Set up cert-manager and install Flink kubernetes operator**
 ```bash
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+
+helm pull jetstack/cert-manager --version 1.18.2 --untar 
+
+helm install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --version v1.18.2 \
+  -f cert-manager_values.yaml
+
 kubectl create -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
 
 helm upgrade --install cp-flink-kubernetes-operator confluentinc/flink-kubernetes-operator \
