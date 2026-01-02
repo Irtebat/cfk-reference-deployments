@@ -1,0 +1,35 @@
+installCRDs: true
+
+image:
+  repository: <your-registry>/jetstack/cert-manager-controller
+  tag: v1.8.2
+  pullPolicy: IfNotPresent
+
+webhook:
+  image:
+    repository: <your-registry>/jetstack/cert-manager-webhook
+    tag: v1.8.2
+    pullPolicy: IfNotPresent
+
+cainjector:
+  image:
+    repository: <your-registry>/jetstack/cert-manager-cainjector
+    tag: v1.8.2
+    pullPolicy: IfNotPresent
+
+startupapicheck:
+  image:
+    repository: <your-registry>/jetstack/cert-manager-startupapicheck
+    tag: v1.8.2
+    pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: <your-image-pull-secret>
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
