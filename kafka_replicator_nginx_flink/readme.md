@@ -518,18 +518,16 @@ helm repo update
 
 helm pull jetstack/cert-manager --version 1.18.2 --untar 
 
-helm install cert-manager jetstack/cert-manager \
-  --namespace cert-manager \
-  --create-namespace \
-  --version v1.18.2 \
-  -f cert-manager_values.yaml
-
-kubectl create -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
+helm upgrade --install cert-manager cert-manager/. --namespace cert-manager --create-namespace --version v1.18.2 -f cert-manager_values.yaml
 
 helm upgrade --install cp-flink-kubernetes-operator confluentinc/flink-kubernetes-operator \
   --version 1.12.1-cp1 \
   -n flink \
   -f ./operator_values/flink-operator_values.yaml
+```
+SKip This Step:
+```
+##kubectl create -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
 ```
 ***Customizing Flink CMF Helm Chart with Node Placement Rules***
 This customization introduces targeted scheduling rules for the Confluent Manager for Flink by modifying the Helm chart.
