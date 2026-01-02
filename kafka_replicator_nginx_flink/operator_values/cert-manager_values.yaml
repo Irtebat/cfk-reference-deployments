@@ -1,5 +1,8 @@
 installCRDs: true
 
+global:
+  imagePullSecrets: <>
+
 image:
   repository: <your-registry>/jetstack/cert-manager-controller
   tag: v1.8.2
