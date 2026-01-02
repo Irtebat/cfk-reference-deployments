@@ -8,11 +8,13 @@ controller:
       image:
         repository: <>/ingress-nginx/kube-webhook-certgen
         tag: <>
+        digest: sha256:03a00eb0e255e8a25fa49926c24cde0f7e12e8d072c445cdf5136ec...
 
     job:
       image:
         repository: <>/ingress-nginx/kube-webhook-certgen
         tag: <>
+        digest: sha256:03a00eb....
     extraArgs:
     enable-ssl-passthrough: "true"
 
