@@ -29,7 +29,7 @@ controller:
   service:
     type: LoadBalancer
     externalTrafficPolicy: Local
-    loadBalancerIP=10.x.x.x
+    loadBalancerIP: 10.x.x.x
 
     annotations:
       service.beta.kubernetes.io/azure-load-balancer-health-probe-protocol: TCP
