@@ -1,4 +1,4 @@
-# Deploy Confluent Platform + Flink using CFK and CMF
+c# Deploy Confluent Platform + Flink using CFK and CMF
 
 This guide provides a comprehensive walkthrough for deploying **Confluent Platform** and **Apache Flink** in an air-gapped Kubernetes environment using **Confluent for Kubernetes (CFK)** and **Confluent Manager for Flink (CMF)**. The reference implementation targets **Azure Kubernetes Service (AKS)**.
 
@@ -276,6 +276,10 @@ openssl genrsa -out <>/certs/privkey.pem 2048
 openssl req -new -key $TUTORIAL_HOME/certs/privkey.pem \
   -out <>/certs/server.csr \
   -subj "/C=US/ST=CA/L=MVT/O=TestOrg/OU=Cloud/CN=*.<DOMAIN>"
+
+openssl req -new   -key privkey.pem   -out server.csr   -subj "/C=US/ST=CA/L=MVT/O=TestOrg/OU=Cloud/CN=*.jio.selabs.net" -addext "subjectAltName=DNS:*.jio.com,DNS:*.coeconfluentdev01.jio.com,DNS:*.cluster.local,DNS:*.svc.cluster.local, DNS:*.confluent.svc.cluster.local,DNS:*.kafka.confluent.svc.cluster.local,DNS:*.flink.svc.cluster.local"
+
+  
 ```
 
 **Create the fullchain.pem certificate for Confluent Servers**
