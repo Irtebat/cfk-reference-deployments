@@ -305,7 +305,7 @@ openssl x509 -req \
   -out fullchain.pem \
   -days 365 \
   -extfile \
-  <(echo "[server_ext]"; echo "extendedKeyUsage=serverAuth,clientAuth"; echo "subjectAltName=DNS:*.jio.com,DNS:*.coeconfluentdev01.jio.com,DNS:*.cluster.local,DNS:*.svc.cluster.local, DNS:*.confluent.svc.cluster.local,DNS:*.kafka.confluent.svc.cluster.local,DNS:*.flink.svc.cluster.local")
+  <(echo "[server_ext]"; echo "extendedKeyUsage=serverAuth,clientAuth"; echo "subjectAltName=DNS:*.jio.com,DNS:*.coeconfluentdev01.jio.com,DNS:*.cluster.local,DNS:*.svc.cluster.local, DNS:*.confluent.svc.cluster.local,DNS:*.kafka.confluent.svc.cluster.local,DNS:*.flink.svc.cluster.local,DNS:*.connect.confluent.svc.cluster.local")
 
   
 ```
