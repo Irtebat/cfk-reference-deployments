@@ -277,7 +277,7 @@ openssl req -new -key $TUTORIAL_HOME/certs/privkey.pem \
   -out <>/certs/server.csr \
   -subj "/C=US/ST=CA/L=MVT/O=TestOrg/OU=Cloud/CN=*.<DOMAIN>"
 
-openssl req -new   -key privkey.pem   -out server.csr   -subj "/C=US/ST=CA/L=MVT/O=TestOrg/OU=Cloud/CN=*.jio.selabs.net" -addext "subjectAltName=DNS:*.jio.com,DNS:*.coeconfluentdev01.jio.com,DNS:*.cluster.local,DNS:*.svc.cluster.local, DNS:*.confluent.svc.cluster.local,DNS:*.kafka.confluent.svc.cluster.local,DNS:*.flink.svc.cluster.local"
+openssl req -new   -key privkey.pem   -out server.csr   -subj "/C=US/ST=CA/L=MVT/O=TestOrg/OU=Cloud/CN=*.jio.selabs.net" -addext "subjectAltName=DNS:*.jio.com,DNS:*.coeconfluentdev01.jio.com,DNS:*.cluster.local,DNS:*.svc.cluster.local, DNS:*.confluent.svc.cluster.local,DNS:*.kafka.confluent.svc.cluster.local,DNS:*.flink.svc.cluster.local,DNS:*.connect.confluent.svc.cluster.local"
 
   
 ```
