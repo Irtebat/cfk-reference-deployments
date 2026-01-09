@@ -160,14 +160,14 @@ spec:
                     - c3
   dependencies:
     schemaRegistry:
-      url: http://schemaregistry.confluent.svc.cluster.local:8081
+      url: https://schemaregistry.confluent.svc.cluster.local:8081
     connect:
       - name: connect
-        url: http://connect.confluent.svc.cluster.local:8083
+        url: https://connect.confluent.svc.cluster.local:8083
     prometheusClient:
-      url: http://controlcenter-next-gen.confluent.svc.cluster.local:9090
+      url: https://controlcenter-next-gen.confluent.svc.cluster.local:9090
     alertManagerClient:
-      url: http://controlcenter-next-gen.confluent.svc.cluster.local:9093
+      url: https://controlcenter-next-gen.confluent.svc.cluster.local:9093
   services:
     prometheus:
       image: <>:<>/confluentinc/cp-enterprise-prometheus:2.3.1
