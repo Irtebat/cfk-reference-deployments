@@ -1,0 +1,26 @@
+---
+apiVersion: cmf.confluent.io/v1
+kind: FlinkApplication
+metadata:
+  name: <>-example
+spec:
+  image:  mustafabhanpura52/<>-example:20260109164512
+  flinkVersion: v1_20
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: '2'
+  serviceAccount: flink
+  jobManager:
+    resource:
+      memory: 1024m
+      cpu: 1
+  taskManager:
+    resource:
+      memory: 1024m
+      cpu: 1
+  job:
+    # Jar is already part of the image and is immediately referenceable
+    jarURI: local:///opt/flink/usrlib/<>Flink-1.0-SNAPSHOT.jar
+    entryClass: com.example.<>.flink.<>WindowSQL
+    state: running
+    parallelism: 1
+    upgradeMode: stateless
