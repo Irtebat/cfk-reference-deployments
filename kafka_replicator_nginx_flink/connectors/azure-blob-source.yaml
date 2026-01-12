@@ -14,6 +14,14 @@ spec:
     value.converter.schemas.enable: "false"
     mode : "GENERIC"
     topics.dir : ""
+    
+    auto.create: "true"
+    auto.create.topics.enable: "true"
+    topic.creation.enable: "true"
+    topic.creation.default.replication.factor: "3"
+    topic.creation.default.partitions: "3"
+    topic.creation.default.cleanup.policy: "delete"
+    
     format.class: "io.confluent.connect.cloud.storage.source.format.CloudStorageJsonFormat"
     topic.regex.list: 'adls-topic:.*\.json'
     flush.size: '1000'
