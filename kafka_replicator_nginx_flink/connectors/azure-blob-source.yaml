@@ -1,0 +1,25 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: blob-source
+  namespace: confluent
+spec:
+  class: "io.confluent.connect.azure.blob.storage.AzureBlobStorageSourceConnector"
+  taskMax: 1 
+  connectClusterRef:
+    name: connect
+    namespace: confluent
+  configs:
+    value.converter: "org.apache.kafka.connect.json.JsonConverter"
+    value.converter.schemas.enable: "false"
+    mode : "GENERIC"
+    topics.dir : ""
+    format.class: "io.confluent.connect.cloud.storage.source.format.CloudStorageJsonFormat"
+    topic.regex.list: 'adls-topic:.*\.json'
+    flush.size: '1000'
+    azblob.account.name : "<>"
+    azblob.account.key: "<>"
+    azblob.container.name: "<>"
+  restartPolicy:
+    type: OnFailure
+    maxRetry: 5
