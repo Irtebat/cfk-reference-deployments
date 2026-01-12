@@ -1,0 +1,21 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: blob-sink
+  namespace: confluent
+spec:
+  class: "io.confluent.connect.azure.blob.AzureBlobStorageSinkConnector"
+  taskMax: 1 
+  connectClusterRef:
+    name: connect
+    namespace: confluent
+  configs:
+    topics: "adls-topic"
+    flush.size: "3"
+    azblob.account.name: "<>"
+    azblob.account.key: "<>"
+    azblob.container.name : "<>"
+    format.class: "io.confluent.connect.azure.blob.format.json.JsonFormat"
+  restartPolicy:
+    type: OnFailure
+    maxRetry: 5
