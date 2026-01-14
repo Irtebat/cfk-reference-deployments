@@ -539,7 +539,7 @@ helm upgrade --install cert-manager cert-manager/. --namespace cert-manager --cr
 
 helm upgrade --install cp-flink-kubernetes-operator confluentinc/flink-kubernetes-operator \
   --version 1.12.1-cp1 \
-  -n flink \
+  -n confluent \
   -f ./operator_values/flink-operator_values.yaml
 ```
 SKip This Step:
@@ -571,13 +571,13 @@ tar xvf ...
 3. Install the operator
 ```bash
 helm upgrade --install cmf confluentinc/confluent-manager-for-apache-flink \
-  --version 2.0.2 \
-  --namespace flink \
+  --version ~2.1.0 \
+  --namespace confluent \
   -f ./operator_values/cmf-operator_values.yaml
 ```
 Verify the operator pods are running
 ```bash
-kubectl get pods -n flink
+kubectl get pods -n confluent
 ```
 ---
 
@@ -595,7 +595,7 @@ kubectl apply -f ./cmf-flink-application-deployment/flink-app.yaml
 
 Access Flink Web UI:
 ```bash
-kubectl port-forward svc/flink-app-rest 8081:8081 -n flink
+kubectl port-forward svc/flink-app-rest 8081:8081 -n confluent
 
 ```
 Note: service name is constructed as <flinkApplication.metadata.name>-rest
