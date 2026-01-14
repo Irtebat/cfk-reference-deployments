@@ -11,6 +11,13 @@ operatorPod:
 
 imagePullSecretRef: <>  
 
+cmf:
+  sql:
+    examples-catalog:
+      enabled: true
+    production: false
+
+
 image:
   repository: <>:<>/confluentinc
   name: cp-cmf
