@@ -3,9 +3,11 @@ apiVersion: platform.confluent.io/v1beta1
 kind: FlinkApplication
 metadata:
   name: <>-example
+  namespace: confluent
 spec:
-  image:  mustafabhanpura52/<>-example:20260109164512
+  image:  mustafabhanpura52/<>-example:20260113170931
   flinkVersion: v1_20
+  flinkEnvironment: flink-env
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: '2'
   serviceAccount: flink
@@ -24,3 +26,6 @@ spec:
     state: running
     parallelism: 1
     upgradeMode: stateless
+  cmfRestClassRef:
+    name: cmfrestclass
+    namespace: confluent
