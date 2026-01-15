@@ -1,0 +1,14 @@
+{
+   "apiVersion": "cmf.confluent.io/v1",
+   "kind": "KafkaCatalog",
+   "metadata": {
+     "name": "kcat"
+   },
+   "spec": {
+     "srInstance": {
+       "connectionConfig": {
+         "schema.registry.url": "http://schemaregistry.$DOMAIN"
+       }
+     }
+   }
+ }
