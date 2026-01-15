@@ -2,9 +2,9 @@ apiVersion: platform.confluent.io/v1beta1
 kind: FlinkEnvironment
 metadata:
   name: flink-env
-  namespace: flink
+  namespace: confluent
 spec:
-  kubernetesNamespace: flink
+  kubernetesNamespace: confluent
   flinkApplicationDefaults:
     metadata:
       labels:
@@ -15,4 +15,4 @@ spec:
         rest.profiling.enabled": "true"
   cmfRestClassRef:
     name: cmfrestclass
-    namespace: flink
+    namespace: confluent
