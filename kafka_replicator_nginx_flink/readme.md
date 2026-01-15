@@ -571,7 +571,7 @@ tar xvf ...
 3. Install the operator
 ```bash
 helm upgrade --install cmf confluentinc/confluent-manager-for-apache-flink \
-  --version ~2.1.0 \
+  --version ~2.2.0 \
   --namespace confluent \
   -f ./operator_values/cmf-operator_values.yaml
 ```
