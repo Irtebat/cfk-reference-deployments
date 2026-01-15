@@ -538,7 +538,7 @@ helm pull jetstack/cert-manager --version 1.18.2 --untar
 helm upgrade --install cert-manager cert-manager/. --namespace cert-manager --create-namespace --version v1.18.2 -f cert-manager_values.yaml
 
 helm upgrade --install cp-flink-kubernetes-operator confluentinc/flink-kubernetes-operator \
-  --version 1.12.1-cp1 \
+  --version 1.120.1 \
   -n confluent \
   -f ./operator_values/flink-operator_values.yaml
 ```
