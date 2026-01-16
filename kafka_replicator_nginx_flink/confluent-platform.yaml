@@ -7,7 +7,7 @@ spec:
   replicas: 3
   oneReplicaPerNode: true
   image:
-    application: docker.io/confluentinc/cp-server:8.0.2
+    application: docker.io/confluentinc/cp-server:8.1.1
     init: docker.io/confluentinc/confluent-init-container:3.1.0
   dataVolumeCapacity: 100Gi
   storageClass:
@@ -43,7 +43,7 @@ spec:
   replicas: 3
   oneReplicaPerNode: true
   image:
-    application: docker.io/confluentinc/cp-server:8.0.2
+    application: docker.io/confluentinc/cp-server:8.1.1
     init: docker.io/confluentinc/confluent-init-container:3.1.0
   dataVolumeCapacity: 2000Gi
   storageClass:
@@ -95,7 +95,7 @@ spec:
   replicas: 2
   oneReplicaPerNode: true
   image:
-    application: docker.io/confluentinc/cp-schema-registry:8.0.2
+    application: docker.io/confluentinc/cp-schema-registry:8.1.1
     init: docker.io/confluentinc/confluent-init-container:3.1.0
   tls:
     secretRef: tls-group
