@@ -51,7 +51,7 @@ confluent --environment flink-env flink compute-pool create compute-pool.json
 ```bash
 curl -v -H "Content-Type: application/json" \
 -X POST http://cmf:8080/cmf/api/v1/catalogs/kafka \
--d@/catalog.json
+-d@catalog.json
 ```
 
 ---
