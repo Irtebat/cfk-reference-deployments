@@ -551,7 +551,7 @@ This customization introduces targeted scheduling rules for the Confluent Manage
 
 1. Pull and extract the helm chart for confluent-manager-for-apache-flink:
 ```bash
-helm pull confluentinc/confluent-manager-for-apache-flink --version 2.0.2
+helm pull confluentinc/confluent-manager-for-apache-flink --version 2.2.0
 tar xvf ...
 ```
 
