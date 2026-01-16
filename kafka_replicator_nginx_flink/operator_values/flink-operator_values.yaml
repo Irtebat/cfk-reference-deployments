@@ -14,5 +14,5 @@ imagePullSecrets:
 
 image:
   repository: <>:<>/confluentinc/cp-flink-kubernetes-operator
-  tag: 1.12.1-cp1
+  tag: 1.12.0-cp1
   pullPolicy: IfNotPresent
