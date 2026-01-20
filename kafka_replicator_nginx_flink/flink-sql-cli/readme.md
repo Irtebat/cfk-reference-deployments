@@ -103,9 +103,10 @@ curl -v -H "Content-Type: application/json" \
 
 confluent --environment flink-env flink compute-pool delete flink-pool
 
-kubectl delete secret cmf-env-key-flink-env -n confluent  
-
 kubectl delete -f flink-env.yaml
+
+(Optional) kubectl delete secret cmf-env-key-flink-env -n confluent
+ 
 kubectl delete -f cmfrestclass.yaml
 helm delete cmf -n confluent
 helm delete cp-flink-kubernetes-operator -n confluent
