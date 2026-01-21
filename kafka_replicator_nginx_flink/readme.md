@@ -362,6 +362,9 @@ Create basic credentials for prometheus & alertmanager client
 kubectl -n operator create secret generic prometheus-client-creds --from-file=basic.txt=./creds/prometheus-client-credentials-secret.txt
 kubectl -n operator create secret generic alertmanager-client-creds --from-file=basic.txt=./creds/alertmanager-client-credentials-secret.txt
 
+Create C3 basic auth users secret
+kubectl create secret generic basicsecret --from-file=basic.txt./creds/basic.txt --namespace confluent
+
 kubectl apply -f storage-class.yaml
 kubectl apply -f confluent-platform.yaml
 ```
