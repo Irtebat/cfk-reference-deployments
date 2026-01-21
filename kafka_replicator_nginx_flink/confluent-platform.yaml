@@ -12,6 +12,16 @@ spec:
   dataVolumeCapacity: 100Gi
   storageClass:
     name: confluent-storage
+  dependencies:
+    metricsClient:
+      url: https://controlcenter-next-gen.confluent.svc.cluster.local:9090
+      authentication:
+        type: basic
+        basic:
+          secretRef: prometheus-client-creds
+      tls:
+        enabled: true
+        secretRef: tls-group
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
@@ -85,6 +95,15 @@ spec:
     kRaftController:
       clusterRef:
         name: kraftcontroller
+    metricsClient:
+      url: https://controlcenter-next-gen.confluent.svc.cluster.local:9090
+      authentication:
+        type: basic
+        basic:
+          secretRef: prometheus-client-creds
+      tls:
+        enabled: true
+        secretRef: tls-group
 ---
 apiVersion: platform.confluent.io/v1beta1
 kind: SchemaRegistry
@@ -137,6 +156,15 @@ spec:
     name: confluent-storage
   tls:
     secretRef: tls-group
+  authentication:
+    type: basic
+    basic:
+      roles:
+       - Administrators
+       - Restricted
+      restrictedRoles:
+       - Restricted
+      secretRef: basicsecret
   podTemplate:
     podSecurityContext:
       fsGroup: 1000
@@ -166,13 +194,39 @@ spec:
         url: https://connect.confluent.svc.cluster.local:8083
     prometheusClient:
       url: https://controlcenter-next-gen.confluent.svc.cluster.local:9090
+      authentication:
+        type: basic
+        basic:
+          secretRef: prometheus-client-creds
+      tls:
+        enabled: true
+        secretRef: tls-group
     alertManagerClient:
       url: https://controlcenter-next-gen.confluent.svc.cluster.local:9093
+      authentication:
+        type: basic
+        basic:
+          secretRef: alertmanager-client-creds
+      tls:
+        enabled: true
+        secretRef: tls-group
   services:
     prometheus:
-      image: <>:<>/confluentinc/cp-enterprise-prometheus:2.3.1
+      image: confluentinc/cp-enterprise-prometheus:2.3.0
+      authentication:
+         type: basic
+         basic:
+          secretRef: prometheus-credentials
+      tls:
+         secretRef: tls-group
       pvc:
         dataVolumeCapacity: 100Gi
     alertmanager:
-      image: <>:<>/confluentinc/cp-enterprise-alertmanager:2.3.1
+      image: confluentinc/cp-enterprise-alertmanager:2.3.0
+      authentication:
+         type: basic
+         basic:
+          secretRef: alertmanager-credentials
+      tls:
+         secretRef: tls-group
 ---
