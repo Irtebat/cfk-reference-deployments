@@ -14,7 +14,7 @@ spec:
     name: confluent-storage
   dependencies:
     metricsClient:
-      url: https://controlcenter-next-gen.confluent.svc.cluster.local:9090
+      url: https://controlcenter.confluent.svc.cluster.local:9090
       authentication:
         type: basic
         basic:
@@ -96,7 +96,7 @@ spec:
       clusterRef:
         name: kraftcontroller
     metricsClient:
-      url: https://controlcenter-next-gen.confluent.svc.cluster.local:9090
+      url: https://controlcenter.confluent.svc.cluster.local:9090
       authentication:
         type: basic
         basic:
@@ -195,7 +195,7 @@ spec:
     kafka:
       bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
     prometheusClient:
-      url: https://controlcenter-next-gen.confluent.svc.cluster.local:9090
+      url: https://controlcenter.confluent.svc.cluster.local:9090
       authentication:
         type: basic
         basic:
@@ -204,7 +204,7 @@ spec:
         enabled: true
         secretRef: tls-group
     alertManagerClient:
-      url: https://controlcenter-next-gen.confluent.svc.cluster.local:9093
+      url: https://controlcenter.confluent.svc.cluster.local:9093
       authentication:
         type: basic
         basic:
