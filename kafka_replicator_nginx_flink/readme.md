@@ -354,6 +354,14 @@ Prepare the configuration:
 - Update manifest files as needed to configure image pulls from Jio's custom Docker registry. For guidance, see: https://docs.confluent.io/operator/current/co-custom-registry.html
 
 ```bash
+Create basic credentials for prometheus & alertmanager server
+kubectl -n operator create secret generic prometheus-credentials --from-file=basic.txt=./creds/prometheus-credentials-secret.txt
+kubectl -n operator create secret generic alertmanager-credentials --from-file=basic.txt=./creds/alertmanager-credentials-secret.txt
+
+Create basic credentials for prometheus & alertmanager client
+kubectl -n operator create secret generic prometheus-client-creds --from-file=basic.txt=./creds/prometheus-client-credentials-secret.txt
+kubectl -n operator create secret generic alertmanager-client-creds --from-file=basic.txt=./creds/alertmanager-client-credentials-secret.txt
+
 kubectl apply -f storage-class.yaml
 kubectl apply -f confluent-platform.yaml
 ```
