@@ -1,17 +1,6 @@
 # Overview
 This guide provides the steps to deploy Confluent Platform using the Confluent for Kubernetes Operator with the following configuration profile:
 
-##### Platform Profile
-- CP version : 7.9
-- CFK version : 2.11.0
-- Deployment runs in KRaft mode
-- Components :
-  - Kafka Brokers
-  - KRaft Controllers
-- Workload Scheduling: 
-  - This reference uses NodeAffinity. Refer <a href="https://docs.confluent.io/operator/current/co-schedule-workloads.html#:~:text=Pod%20topology%20constraints%20only%20apply%20to%20pods%20within%20the%20same%20namespace.&text=You%20can%20configure%20CFK%20to,running%20on%20the%20same%20node.">here</a> for details on Pod scheduling in CFK and other available options.
-  - The configured values in manifest files, lead to co-location of component. Update the scheudling to match your requirement.
-
 ##### Security profile
 
 Confluent Platform cluster is setup with the following security:
@@ -20,43 +9,6 @@ Confluent Platform cluster is setup with the following security:
   - mTLS : for inter-cp-component communication
   - mtlS : kafka client to Broker communication
 - Authorization : RBAC
-
-##### Network Profile
-```
-Client (VM or service in VNet)
-    ↕
-Azure Load Balancer (ILB) with IP accessible to client (may be public or private)
-    ↕
-Kafka Pods ( Access configured via NodePort )
-```
-
-## Prerequisites
-The scope of this readme assumes exisistence of an L4 Load Balancer for enabling external access. 
-The IP of this Loadbalancer will be utilized to advertise kafka address to external clients
-For an example reference, read lb-setup-readme.md
-
-## Create confluent Namespace
-```
-kubectl create namespace xp
-```
-
-## Deploy Confluent for Kubernetes
-
-* Set up the Helm Chart:
-```
-helm repo add confluentinc https://packages.confluent.io/helm
-helm repo update
-```
-
-* Install Confluent For Kubernetes using Helm:
-```
-helm upgrade --install operator confluentinc/confluent-for-kubernetes -n xp 
-```
-
-* Check that the Confluent for Kubernetes pod comes up and is running:
-```
-kubectl get pods -n xp
-```
 
 ## Create TLS certificates
 
@@ -83,19 +35,19 @@ openssl rsa -in ./utils/mds-tokenkeypair.txt -outform PEM -pubout -out ./utils/m
 kubectl create secret generic mds-token \
 --from-file=mdsPublicKey.pem=./utils/mds-publickey.txt \
 --from-file=mdsTokenKeyPair.pem=./utils/mds-tokenkeypair.txt \
--n xp
+-n confluent
 ```
 ## Deploy Confluent Platform
 
 * Deploy Confluent Platform
 ```
-kubectl apply -f ./deployment/confluent-platform-kraft.yaml
+kubectl apply -f ./deployment/confluent-platform.yaml
 ```
 
 * Check Confluent Platform is deployed:
 
 ```
-kubectl get pods -n xp
+kubectl get pods -n confluent
 ```
 
 ## Validate
@@ -105,17 +57,17 @@ kubectl get pods -n xp
 k exec -it kafka-0 -- bash
 
 [appuser@kafka-0 ~]
-openssl s_client -connect kafka-0.kafka.xp.svc.cluster.local:8090 \
+openssl s_client -connect kafka-0.kafka.confluent.svc.cluster.local:8090 \
   -cert /mnt/sslcerts/fullchain.pem \
   -key /mnt/sslcerts/privkey.pem \
   -CAfile /mnt/sslcerts/cacerts.pem
 [appuser@kafka-0 ~]
-openssl s_client -connect kafka-1.kafka.xp.svc.cluster.local:8090 \
+openssl s_client -connect kafka-1.kafka.confluent.svc.cluster.local:8090 \
   -cert /mnt/sslcerts/fullchain.pem \
   -key /mnt/sslcerts/privkey.pem \
   -CAfile /mnt/sslcerts/cacerts.pem
 [appuser@kafka-0 ~]
-openssl s_client -connect kafka-2.kafka.xp.svc.cluster.local:8090 \
+openssl s_client -connect kafka-2.kafka.confluent.svc.cluster.local:8090 \
   -cert /mnt/sslcerts/fullchain.pem \
   -key /mnt/sslcerts/privkey.pem \
   -CAfile /mnt/sslcerts/cacerts.pem
@@ -131,15 +83,6 @@ openssl s_client -connect kafka-2.kafka.xp.svc.cluster.local:8090 \
   -ca-key=./utils/generated/rootCAkey.pem \
   -config=./cfssl_cert-generation/ca-config.json \
   -profile=server ./deployment/client/client-domain.json | cfssljson -bare ./deployment/client/certs/client
-  ```
-  Option 2: with cert-manager
-
-  ```
-  k apply -f ./cert-manager_cert-generation/04-kafka-client-cert.yaml
-  kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.crt}' | base64 -d > ./deployment/client/certs/client.pem
-  kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.tls\.key}' | base64 -d > ./deployment/client/certs/client-key.pem
-  mkdir ./utils/generated
-  kubectl get secret tls-kafka-client -n xp -o jsonpath='{.data.ca\.crt}' | base64 -d > ./utils/generated/cacerts.pem
   ```
 Note: Confluent Platform components and client certificates should be signed by the same Certificate Authority. 
 
@@ -189,19 +132,19 @@ openssl s_client \
 
 ### Validate Commands:
 
-Note: Replace 98.70.146.223:32524 below with LB IP and Advertised kafka Port
+Note: Replace kafka.DOMAIN:443 below with LB IP and Advertised kafka Port
 
 * List topics
 ```
 kafka-topics   \
-  --bootstrap-server 98.70.146.223:32524 \
+  --bootstrap-server kafka.DOMAIN:443 \
   --command-config ./deployment/client/client.properties \
   --list
 ```
 * Create Topic
 ```
 kafka-topics \
-  --bootstrap-server 98.70.146.223:32524 \
+  --bootstrap-server kafka.DOMAIN:443 \
   --command-config ./deployment/client/client.properties \
   --create \
   --topic test-topic \
@@ -211,14 +154,14 @@ kafka-topics \
 * Produce Messages
 ```
 kafka-console-producer \
-  --bootstrap-server 98.70.146.223:32524 \
+  --bootstrap-server kafka.DOMAIN:443 \
   --producer.config ./deployment/client/client.properties \
   --topic test-topic
 ```
 * Consume Messages
 ```
 kafka-console-consumer \
-  --bootstrap-server 98.70.146.223:32524 \
+  --bootstrap-server kafka.DOMAIN:443 \
   --consumer.config ./deployment/client/client.properties \
   --topic test-topic \
   --from-beginning
@@ -227,8 +170,8 @@ kafka-console-consumer \
 ## Tear down
 
 ```
-kubectl delete confluentrolebinding --all -n xp
-kubectl delete -f ./deployment/confluent-platform-kraft.yaml -n xp
-kubectl delete secret mds-token root-ca-secret tls-kafka tls-kafka-client --namespace xp
-helm uninstall operator -n xp
+kubectl delete confluentrolebinding --all -n confluent
+kubectl delete -f ./deployment/confluent-platform-kraft.yaml -n confluent
+kubectl delete secret mds-token root-ca-secret tls-kafka tls-kafka-client --namespace confluent
+helm uninstall operator -n confluent
 ```
