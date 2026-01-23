@@ -1,9 +1,0 @@
-DeveloperManage Role (./topic-manager/DeveloperManager-topic.yaml)
-- To create a topic
-- To list a topic
-
-DeveloperWrite ( ./write-to-topic/DeveloperWrite-topic.yaml )
-- To write to a topic
-
-DeveloperWrite ( ./write-from-topic/DeveloperRead-topic.yaml, ./write-from-topic/DeveloperRead-consumer_group.yaml  )
-- To read from a topic ( DeveloperRead-consumer_group.yaml enables the use of a consumer group )
