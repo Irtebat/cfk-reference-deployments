@@ -1,0 +1,14 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafkaclient-topic-owner
+  namespace: xp
+spec:
+  principal:
+    type: user
+    name: kafkaclient
+  role: ResourceOwner
+  resourcePatterns:
+    - name: test-topic
+      resourceType: Topic
+      patternType: LITERAL
