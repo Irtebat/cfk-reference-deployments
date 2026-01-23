@@ -1,0 +1,29 @@
+{
+  "CN": "kafka",
+  "hosts": [
+    "*.<>.selabs.net",
+    "kafka",
+    "*.confluent.svc.cluster.local",
+    "*.flink.svc.cluster.local",
+    "*.kafka.confluent.svc.cluster.local",
+    "*.kraftcontroller.confluent.svc.cluster.local",
+    "*.connect.confluent.svc.cluster.local",
+    "*.controlcenter.confluent.svc.cluster.local",
+    "*.schemaregistry.confluent.svc.cluster.local",
+    "*.cmf.confluent.svc.cluster.local",
+    "*.svc.cluster.local"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "IN",
+      "ST": "MH",
+      "L": "Mumbai",
+      "O": "Confluent",
+      "OU": "Kafka"
+    }
+  ]
+}
