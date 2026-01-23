@@ -167,6 +167,20 @@ kafka-console-consumer \
   --from-beginning
 ```
 
+* Test Schema Registry & connect 
+```
+curl -k https://schemaregistry.jio.selabs.net  --cert keystore.p12:changeit \
+  --cert-type P12 \
+  --cacert utils/generated/cacerts.pem 
+{}
+
+curl -k https://connect.jio.selabs.net  --cert keystore.p12:changeit   --cert-type P12   --cacert utils/generated/cacerts.pem 
+{"version":"7.8.1-ce","commit":"eefb51c6f2f1b888","kafka_cluster_id":"ZmZhNmZkNjktODk4Ny00MQ"}root@sid-aks-bastion-vm:~/cfk/repo/new/auth/certs/cfsslcerts# 
+
+```
+
+
+
 ## Tear down
 
 ```
