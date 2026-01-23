@@ -1,0 +1,22 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: KafkaTopic
+metadata:
+  name: topic-a
+  namespace: xp
+spec:
+  replicas: 1
+  partitionCount: 12
+  configs:
+    cleanup.policy: "delete"
+    retention.ms: "604800000"
+    segment.bytes: "1073741824"
+    segment.ms: "604800000"
+    compression.type: "producer"
+  kafkaClusterRef:
+    name: kafka
+  kafkaRest:
+    authentication:
+      type: mtls
+      sslClientAuthentication: true
+    tls:
+      secretRef: tls-kafka

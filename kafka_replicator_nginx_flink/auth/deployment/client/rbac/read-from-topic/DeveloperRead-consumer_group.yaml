@@ -1,0 +1,14 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafkaclient-group-read
+  namespace: xp
+spec:
+  principal:
+    type: user
+    name: kafkaclient
+  role: DeveloperRead
+  resourcePatterns:
+    - name: console-consumer # <group-id>
+      resourceType: Group
+      patternType: PREFIXED

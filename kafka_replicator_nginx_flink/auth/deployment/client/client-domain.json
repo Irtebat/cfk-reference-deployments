@@ -1,0 +1,20 @@
+{
+  "CN": "kafkaclient",
+  "hosts": [
+    "xp.com",
+    "kafkaclient"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "IN",
+      "ST": "MH",
+      "L": "Mumbai",
+      "O": "Confluent",
+      "OU": "ControlCenter"
+    }
+  ]
+}
