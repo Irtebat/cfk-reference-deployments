@@ -1,0 +1,70 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connect
+metadata:
+  name: connect
+  namespace: confluent
+spec:
+  replicas: 1
+  configOverrides:
+    jvm:
+      - "--add-opens=java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED"
+    server:
+      #- plugin.path=/usr/share/confluent-hub-components
+  image:
+    application: vyavaharesiddesh/cp-server-connect-all-v2:7.8.1
+    init: cfltacr.azurecr.io/confluent-init-container:3.1.0
+  tls:
+   secretRef: tls-group2
+  authorization:
+    type: rbac
+  authentication:
+    type: mtls
+    mtls:
+      sslClientAuthentication: "required"
+      principalMappingRules: [ "RULE:.*CN=([a-zA-Z0-9.-]*).*$/$1/" , "DEFAULT" ]
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "4"
+        memory: "8Gi"
+      limits:
+        cpu: "8"
+        memory: "16Gi"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: app-confluent
+                  operator: In
+                  values:
+                    - connect
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
+      authentication:
+        type: mtls
+        sslClientAuthentication: true
+      tls:
+        enabled: true
+    mds:
+      endpoint: https://kafka.confluent.svc.cluster.local:8090
+      tokenKeyPair:
+        secretRef: mds-token
+      authentication:
+        type: mtls
+        sslClientAuthentication: true
+      tls:
+        enabled: true
+    schemaRegistry:
+      url: https://schemaregistry.confluent.svc.cluster.local:8081
+      authentication:
+        type: mtls
+      tls:
+        enabled: true
+    interceptor:
+      enabled: true
