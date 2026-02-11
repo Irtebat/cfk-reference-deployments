@@ -11,6 +11,9 @@
     "*.controlcenter.confluent.svc.cluster.local",
     "*.schemaregistry.confluent.svc.cluster.local",
     "*.cmf.confluent.svc.cluster.local",
+    "cmf-service",
+    "cmf-service.confluent.svc.cluster.local",
+    "*.cmf-service.confluent.svc.cluster.local",
     "*.svc.cluster.local"
   ],
   "key": {
