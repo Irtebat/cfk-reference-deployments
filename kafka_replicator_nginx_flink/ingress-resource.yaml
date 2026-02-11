@@ -26,7 +26,7 @@ spec:
             backend:
               service:
                 name: kafka-bootstrap
-                port: 
+                port:
                   number: 9092
     - host: b0.<DOMAIN>
       http:
@@ -76,7 +76,7 @@ spec:
             backend:
               service:
                 name: sr-bootstrap
-                port: 
+                port:
                   number: 8081
     - host: connect.<DOMAIN>
       http:
@@ -86,5 +86,5 @@ spec:
             backend:
               service:
                 name: connect-bootstrap
-                port: 
+                port:
                   number: 8083
