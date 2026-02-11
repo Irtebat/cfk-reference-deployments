@@ -1,0 +1,428 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: KRaftController
+metadata:
+  name: kraftcontroller
+  namespace: confluent
+spec:
+  replicas: 3
+  oneReplicaPerNode: true
+  image:
+    application: confluentinc/cp-server:8.1.1
+    init: cfltacr.azurecr.io/confluent-init-container:3.1.0
+  dataVolumeCapacity: 100Gi
+  storageClass:
+    name: confluent-storage
+  listeners:
+    controller:
+      authentication:
+        type: mtls
+        principalMappingRules:
+          - "RULE:.*CN=([a-zA-Z0-9.-]*).*$/$1/"
+          - "DEFAULT"
+      tls:
+        enabled: true
+  tls:
+    secretRef: tls-group
+  authorization:
+    type: rbac
+    superUsers:
+      - User:kafka
+  dependencies:
+    mdsKafkaCluster:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
+      authentication:
+        type: mtls
+        sslClientAuthentication: true
+      tls:
+        enabled: true
+    metricsClient:
+      url: https://controlcenter.confluent.svc.cluster.local:9090
+      authentication:
+        type: basic
+        basic:
+          secretRef: prometheus-client-creds
+      tls:
+        enabled: true
+        secretRef: tls-group
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "2"
+        memory: "4Gi"
+      limits:
+        cpu: "4"
+        memory: "4Gi"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: app-confluent
+                  operator: In
+                  values:
+                    - kraft
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: Kafka
+metadata:
+  name: kafka
+  namespace: confluent
+spec:
+  replicas: 3
+  oneReplicaPerNode: true
+  image:
+    application: confluentinc/cp-server:8.1.1
+    init: cfltacr.azurecr.io/confluent-init-container:3.1.0
+  dataVolumeCapacity: 2000Gi
+  storageClass:
+    name: confluent-storage
+  tls:
+    secretRef: tls-group
+  configOverrides:
+    server:
+    - confluent.telemetry.enabled=true
+    - confluent.telemetry.exporter._c3.enabled=true
+    - confluent.telemetry.exporter._c3.type=http
+    - "confluent.security.event.router.config={\"destinations\":{ \"topics\":{\"confluent-audit-log-events\":{\"retention_ms\":604800000}}},\"default_topics\":{\"allowed\":\"confluent-audit-log-events\",\"denied\":\"confluent-audit-log-events\"},\"excluded_principals\":[],\"routes\":{\"crn://kafka.confluent.svc.cluster.local:8090/kafka=MzM0ZjQ0MzAtMzk1MC00Yg/topic=test\":{\"produce\":{\"allowed\":\"confluent-audit-log-events\",\"denied\":\"confluent-audit-log-events\"},\"consume\":{\"allowed\":\"confluent-audit-log-events\",\"denied\":\"confluent-audit-log-events\"},\"describe\":{\"allowed\":\"confluent-audit-log-events\",\"denied\":\"confluent-audit-log-events\"}}}}"
+  listeners:
+    internal:
+      authentication:
+        type: mtls
+        principalMappingRules:
+          - "RULE:.*CN=([a-zA-Z0-9.-]*).*$/$1/"
+          - "DEFAULT"
+      tls:
+        enabled: true
+    external:
+      authentication:
+        type: mtls
+        principalMappingRules:
+          - "RULE:.*CN=([a-zA-Z0-9.-]*).*$/$1/"
+          - "DEFAULT"
+      externalAccess:
+        type: staticForHostBasedRouting
+        staticForHostBasedRouting:
+          domain: <DOMAIN>
+          brokerPrefix: b
+          port: 443
+      tls:
+        enabled: true
+  authorization:
+    type: rbac
+    superUsers:
+      - User:kafka
+  metricReporter:
+    enabled: true
+    tls:
+      enabled: true
+    authentication:
+      type: mtls
+  services:
+    mds:
+      impersonation:
+        admins:
+          - User:kafka
+          - User:krp
+          - User:testuser1
+          - User:c3
+      tls:
+        enabled: true
+      tokenKeyPair:
+        secretRef: mds-token
+      provider:
+        mtls:
+          sslClientAuthentication: "required"
+          principalMappingRules:
+            - "RULE:.*CN=([a-zA-Z0-9.-]*).*$/$1/"
+            - "DEFAULT"
+        file:
+          secretRef: file-secret
+        # sso:
+        #   clientCredentials:
+        #     secretRef: oidccredential
+        #   configurations:
+        #     groupsClaimName: profile_groups
+        #     subClaimName: sub
+        #     issuer: http://localhost:8080/realms/sso_test
+        #     jwksEndpointUri: http://keycloak:8080/realms/sso_test/protocol/openid-connect/certs
+        #     authorizeBaseEndpointUri: http://localhost:8080/realms/sso_test/protocol/openid-connect/auth
+        #     tokenBaseEndpointUri: http://keycloak:8080/realms/sso_test/protocol/openid-connect/token
+        #     refreshToken: false
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "32"
+        memory: "8Gi"
+      limits:
+        cpu: "24"
+        memory: "64Gi"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: app-confluent
+                  operator: In
+                  values:
+                    - kafka-broker
+  dependencies:
+    kafkaRest:
+      authentication:
+        type: mtls
+        sslClientAuthentication: true
+      tls:
+        enabled: true
+        secretRef: tls-group
+    kRaftController:
+      clusterRef:
+        name: kraftcontroller
+      controllerListener:
+        tls:
+          enabled: true
+        authentication:
+          type: mtls
+    metricsClient:
+      url: https://controlcenter.confluent.svc.cluster.local:9090
+      authentication:
+        type: basic
+        basic:
+          secretRef: prometheus-client-creds
+      tls:
+        enabled: true
+        secretRef: tls-group
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: SchemaRegistry
+metadata:
+  name: schemaregistry
+  namespace: confluent
+spec:
+  replicas: 2
+  oneReplicaPerNode: true
+  image:
+    application: confluentinc/cp-schema-registry:8.1.1
+    init: cfltacr.azurecr.io/confluent-init-container:3.1.0
+  tls:
+    secretRef: tls-group
+  authorization:
+    type: rbac
+  authentication:
+    type: mtls
+    mtls:
+      sslClientAuthentication: "required"
+      principalMappingRules: 
+         - "RULE:.*CN=([a-zA-Z0-9.-]*).*$/$1/"
+         - "DEFAULT"
+  podTemplate:
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "1"
+        memory: "2Gi"
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: app-confluent
+                  operator: In
+                  values:
+                    - sr
+  dependencies:
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
+      authentication:
+        type: mtls
+        sslClientAuthentication: true
+      tls:
+        enabled: true
+    mds:
+      endpoint: https://kafka.confluent.svc.cluster.local:8090
+      tokenKeyPair:
+        secretRef: mds-token
+      authentication:
+        type: mtls
+        sslClientAuthentication: true
+      tls:
+        enabled: true
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ControlCenter
+metadata:
+  name: controlcenter
+  namespace: confluent
+spec:
+  replicas: 1
+  oneReplicaPerNode: true
+  image:
+    application: confluentinc/cp-enterprise-control-center-next-gen:2.4.0
+    init: confluentinc/confluent-init-container:3.1.0
+  dataVolumeCapacity: 300Gi
+    #authentication:
+    #type: basic
+    #basic:
+    #  roles:
+    #   - Administrators
+    #   - Restricted
+    #  restrictedRoles:
+    #   - Restricted
+    #  secretRef: basicsecret
+  authorization:
+    type: rbac
+  storageClass:
+    name: confluent-storage
+  tls:
+    secretRef: tls-group
+  configOverrides:
+   server:
+     - confluent.controlcenter.telemetry.enabled=true
+     - confluent.controlcenter.telemetry.collector.enabled=true
+     - confluent.controlcenter.telemetry.collector.port=4318
+     - confluent.controlcenter.rest.sni.host.check.enabled=false
+       #- confluent.controlcenter.mode.enable=management
+     - confluent.controlcenter.cmf.alias.name=cmf
+     - confluent.controlcenter.cmf.enable=true
+     - confluent.controlcenter.cmf.url=https://cmf-service.confluent.svc.cluster.local:80/
+     - confluent.controlcenter.cmf.ssl.truststore.location=/mnt/truststore/truststore.jks
+     - confluent.controlcenter.cmf.ssl.truststore.password=changeit
+     - confluent.controlcenter.cmf.ssl.keystore.location=/mnt/keystore/keystore.jks
+     - confluent.controlcenter.cmf.ssl.keystore.password=changeit
+     - confluent.controlcenter.cmf.ssl.key.password=changeit
+     - confluent.controlcenter.cmf.ssl.client.authentication=REQUIRED
+  mountedVolumes:
+    volumeMounts:
+     - name: truststore
+       mountPath: /mnt/truststore
+     - name: keystore
+       mountPath: /mnt/keystore
+    volumes:
+     - name: truststore
+       secret:
+         secretName: mtlstruststore
+     - name: keystore
+       secret:
+         secretName: mtlskeystore
+  podTemplate:
+    probe:
+      liveness:
+        periodSeconds: 30
+        failureThreshold: 15
+        timeoutSeconds: 1500
+    podSecurityContext:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: "8"
+        memory: "16Gi"
+      limits:
+        cpu: "12"
+        memory: "32Gi"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: app-confluent
+                  operator: In
+                  values:
+                    - c3
+  dependencies:
+    schemaRegistry:
+      url: https://schemaregistry.confluent.svc.cluster.local:8081
+      authentication:
+        type: mtls
+      tls:
+        enabled: true
+    kafka:
+      bootstrapEndpoint: kafka.confluent.svc.cluster.local:9071
+      authentication:
+        type: mtls
+      tls:
+        enabled: true
+    mds:
+      # ssoProtocol: oidc
+      endpoint: https://kafka.confluent.svc.cluster.local:8090
+      tokenKeyPair:
+        secretRef: mds-token
+      authentication:
+        type: mtls
+        sslClientAuthentication: true
+      tls:
+        enabled: true
+    connect:
+      - name: connect
+        url: https://connect.confluent.svc.cluster.local:8083
+        authentication:
+          type: mtls
+        tls:
+          enabled: true
+    prometheusClient:
+      url: https://controlcenter.confluent.svc.cluster.local:9090
+      authentication:
+        type: basic
+        basic:
+          secretRef: prometheus-client-creds
+      tls:
+        enabled: true
+        secretRef: tls-group
+    alertManagerClient:
+      url: https://controlcenter.confluent.svc.cluster.local:9093
+      authentication:
+        type: basic
+        basic:
+          secretRef: alertmanager-client-creds
+      tls:
+        enabled: true
+        secretRef: tls-group
+  services:
+    prometheus:
+      image: confluentinc/cp-enterprise-prometheus:2.4.0
+      authentication:
+         type: basic
+         basic:
+          secretRef: prometheus-credentials
+      tls:
+         secretRef: tls-group
+      pvc:
+        dataVolumeCapacity: 100Gi
+    alertmanager:
+      image: confluentinc/cp-enterprise-alertmanager:2.4.0
+      authentication:
+         type: basic
+         basic:
+          secretRef: alertmanager-credentials
+      tls:
+         secretRef: tls-group
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: KafkaRestClass
+metadata:
+  name: default
+  namespace: confluent
+spec:
+  kafkaClusterRef:
+    name: kafka
+    namespace: confluent
+  kafkaRest:
+    endpoint: https://kafka.confluent.svc.cluster.local:8090
+    authentication:
+      type: mtls
+      sslClientAuthentication: true
+    tls:
+      secretRef: tls-group
