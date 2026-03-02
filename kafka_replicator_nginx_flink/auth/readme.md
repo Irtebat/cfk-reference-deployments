@@ -367,6 +367,8 @@ kubectl create secret generic basicsecret --from-file=basic.txt./creds/basic.txt
 
 kubectl apply -f storage-class.yaml
 kubectl apply -f confluent-platform.yaml
+kubectl apply -f kafka-c3-rbac.yaml
+kubectl apply -f ad-group-rbac.yaml
 ```
 
 Validate deployment:
@@ -533,7 +535,7 @@ Update ./replicator/connect.yaml to refer to this updated image
 kubectl apply -f ./replicator/connect.yaml
 kubectl apply -f ./replicator/replicator.yaml
 ```
-## Step 13: Deploy Flink Operators
+## Step 13: Deploy Flink Operators & Flink SQL UI
 
 Create a namespace for flink workloads:
 ```
@@ -590,9 +592,47 @@ Verify the operator pods are running
 ```bash
 kubectl get pods -n confluent
 ```
+
+3. Install Flink rbac for kafka & AD group users.
+```bash
+kubectl apply -f ./rbac/kafka-c3-flink-rbac.yaml
+kubectl apply -f ./rbac/ad-group-flink-rbac.yaml
+```
+
+4. Create Flink environment from FLink UI:
+
+5. Add Secrets for SR and Kafka DB: 
+```bash
+{}
+```
+
+6. Create Flink Catalog using JSON: 
+```bash
+{
+  "schema.registry.url": "https://schemaregistry.<>.selabs.net",
+  "schema.registry.ssl.truststore.location": "/mnt/truststore/truststore.jks",
+  "schema.registry.ssl.truststore.password": "changeit",
+  "schema.registry.ssl.keystore.location": "/mnt/keystore/keystore.jks",
+  "schema.registry.ssl.keystore.password": "changeit",
+  "schema.registry.ssl.key.password": "changeit"
+}
+```
+6. Add database to flink catalog and attach the secrets: 
+```bash
+{}
+```
+7. Run Statements:
+
+```bash
+show tables;
+describe table pageviews;
+select * from pageviews;
+```
+
+
 ---
 
-## Step 13: Deploy Flink Applications
+## Step 14: Deploy Flink Applications CLI (Optional)
 
 Update the Flink application configuration with Azure blob storage access keys.
 
