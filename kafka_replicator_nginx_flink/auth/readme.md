@@ -1,4 +1,4 @@
-c# Deploy Confluent Platform + Flink using CFK and CMF
+# Deploy Confluent Platform + Flink using CFK and CMF
 
 This guide provides a comprehensive walkthrough for deploying **Confluent Platform** and **Apache Flink** in an air-gapped Kubernetes environment using **Confluent for Kubernetes (CFK)** and **Confluent Manager for Flink (CMF)**. The reference implementation targets **Azure Kubernetes Service (AKS)**.
 
