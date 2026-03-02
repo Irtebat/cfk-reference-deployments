@@ -601,26 +601,46 @@ kubectl apply -f ./rbac/ad-group-flink-rbac.yaml
 
 4. Create Flink environment from FLink UI:
 
-5. Add Secrets for SR and Kafka DB: 
+5. Add Secrets for Kafka DB:
 ```bash
-{}
+{
+    "security.protocol": "SSL",
+    "ssl.truststore.type": "PEM",
+    "ssl.keystore.type": "PEM",
+    "ssl.truststore.certificates": "-----BEGIN CERTIFICATE-----\nMIIDlzCCAn+gAwIBAgIUQfRZsXXXXXXeYea2Y6ItdoM5NISNzfQ4uNE0BAnMgUF/Z5SCvj4qn8zrOCNwV/\nOWtPtjfYgW2+fHV2LgJqaEyXJVWs7MSstcJ10fbLUfmkyGWvRxM2qB0tIfEczpie\nERIE69601SZMRxQ=\n-----END CERTIFICATE-----\n",
+    "ssl.keystore.certificate.chain": "-----BEGIN CERTIFICATE-----\nMIIGRDCCBSygAwIBAgIUUpDP2fXXXXX0pyZ0zlaA5ftO6bBFzoQu+YxUb3uZkqTVGC4CmCMWZFe9IsnsXKd9sW+G6oXS9Z\nFQBXubWbSoRK/6gO8sLQDJgyftDyrEvozLz+7Nv8S9s4WKFx6d4oiLDsrjTy8UxS\nPKDjTzSfTkSAH8rqoa4OmCXVpuCu0GpO\n-----END CERTIFICATE-----\n",
+    "ssl.keystore.key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEXXXXXXvJsOK+RzOQKBgEAQQE4s6ZO7pZsSu1/i\n8c5mlMxFgIcXtw7u4luPl2TtBr8UPhCTUGi6aTEwXyW+io8iwzd2KQa5KGtADUCn\nNf7O8BK1bSK8PgaDv7zPl8ySRjBtdgY1h5rzTIuV0FxS8Hbvn1wz/8h3vQqzAoFv\nULl5w9jya34ANZJuxouWEWNU\n-----END PRIVATE KEY-----\n"
+}
+```
+
+6. Add Secrets for SR: 
+```bash
+{
+    "schema.registry.security.protocol": "SSL",
+    "schema.registry.ssl.truststore.type": "PEM",
+    "schema.registry.ssl.keystore.type": "PEM",
+    "schema.registry.ssl.truststore.certificates": "-----BEGIN CERTIFICATE-----\nMIIDlzCCAn+gAwIBAgIUQfRZsXXXXmPeYea2Y6ItdoM5NISNzfQ4uNE0BAnMgUF/Z5SCvj4qn8zrOCNwV/\nOWtPtjfYgW2+fHV2LgJqaEyXJVWs7MSstcJ10fbLUfmkyGWvRxM2qB0tIfEczpie\nERIE69601SZMRxQ=\n-----END CERTIFICATE-----\n",
+    "schema.registry.ssl.keystore.certificate.chain": "-----BEGIN CERTIFICATE-----\nMIIGRDCCBSygAwIBAgIUUpDP2f1XXXO\n-----END CERTIFICATE-----\n",
+    "schema.registry.ssl.keystore.key": "-----BEGIN PRIVATE KEY-----\nMIIEvgXXXXWNU\n-----END PRIVATE KEY-----\n"
+}
 ```
 
 6. Create Flink Catalog using JSON: 
 ```bash
 {
-  "schema.registry.url": "https://schemaregistry.<>.selabs.net",
-  "schema.registry.ssl.truststore.location": "/mnt/truststore/truststore.jks",
-  "schema.registry.ssl.truststore.password": "changeit",
-  "schema.registry.ssl.keystore.location": "/mnt/keystore/keystore.jks",
-  "schema.registry.ssl.keystore.password": "changeit",
-  "schema.registry.ssl.key.password": "changeit"
+  "schema.registry.url": "https://schemaregistry.<>.selabs.net"
 }
 ```
 6. Add database to flink catalog and attach the secrets: 
 ```bash
-{}
+{
+  "bootstrap.servers": "kafka.<>.selabs.net:443"
+}
 ```
+7. Link secrets with Catalog for both SR & Kafka:
+<img width="3456" height="2234" alt="image" src="https://github.com/user-attachments/assets/7859bf36-338a-4f8b-8d9a-eb3ffa832446" />
+
+
 7. Run Statements:
 
 ```bash
