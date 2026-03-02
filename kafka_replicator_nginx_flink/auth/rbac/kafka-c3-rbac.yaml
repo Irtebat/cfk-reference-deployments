@@ -1,0 +1,46 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafka-rb
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: kafka
+  role: ClusterAdmin
+  ## if use other kafkaRestClass except for default, need to configure accordingly
+  #kafkaRestClassRef:
+  # name: krp
+---
+# rolebinding `testuser-rb-sr` allows `testuser1` to see schemaregistry information
+# `schemaRegistryCllusterId` pattern: `id_<schemaregistry.name>_<namespace>`
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafka-rb-sr
+  namespace: confluent
+spec:
+  # The Schema Registry cluster is named `schemaregistry` and is deployed in the
+  # namespace `confluent`
+  # The Schema Registry cluster id naming pattern is: id_<sr-cluster-name>_<namespace>
+  clustersScopeByIds:
+    schemaRegistryClusterId: id_schemaregistry_confluent
+  principal:
+    name: kafka
+    type: user
+  role: SystemAdmin
+---
+# rolebinding `testuser-rb-connect` allows `testuser1` to see connect cluster
+# `connectClusterId` pattern: `<namespace>.<connect.name>`
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafka-rb-connect
+  namespace: confluent
+spec:
+  principal:
+    type: user
+    name: kafka
+  clustersScopeByIds:
+    connectClusterId: confluent.connect
+  role: SystemAdmin
