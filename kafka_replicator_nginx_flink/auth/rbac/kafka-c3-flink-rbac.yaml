@@ -1,0 +1,106 @@
+# rolebinding `kafka` allows `kafka` to see kafkaCluster
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafka-user-flink-env-access
+  namespace: confluent
+spec:
+  clustersScopeByIds:
+    cmfId: CMF-id
+  principal:
+    type: user
+    name: kafka
+  role: SystemAdmin
+---
+# rolebinding `kafka-sr` allows `kafka` to see schemaregistry information
+# `schemaRegistryCllusterId` pattern: `id_<schemaregistry.name>_<namespace>`
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafka-rb-sr-flink-read
+  namespace: confluent
+spec:
+  clustersScopeByIds:
+    schemaRegistryClusterId: id_schemaregistry_confluent
+  principal:
+    name: kafka
+    type: user
+  role: DeveloperRead
+  resourcePatterns:
+  - name: "*"
+    patternType: LITERAL
+    resourceType: Subject
+---
+# rolebinding `kafka-sr` allows `kafka` to see schemaregistry information
+# `schemaRegistryCllusterId` pattern: `id_<schemaregistry.name>_<namespace>`
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafka-rb-sr-flink-write
+  namespace: confluent
+spec:
+  clustersScopeByIds:
+    schemaRegistryClusterId: id_schemaregistry_confluent
+  principal:
+    name: kafka
+    type: user
+  role: DeveloperWrite
+  resourcePatterns:
+  - name: "*"
+    patternType: LITERAL
+    resourceType: Subject
+---
+# rolebinding `kafka-sr` allows `kafka` to see schemaregistry information
+# `schemaRegistryCllusterId` pattern: `id_<schemaregistry.name>_<namespace>`
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafka-rb-sr-flink-manage
+  namespace: confluent
+spec:
+  clustersScopeByIds:
+    schemaRegistryClusterId: id_schemaregistry_confluent
+  principal:
+    name: kafka
+    type: user
+  role: DeveloperManage
+  resourcePatterns:
+  - name: "*"
+    patternType: LITERAL
+    resourceType: Subject
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafka-flink-computepool-rb
+  namespace: confluent
+spec:
+  clustersScopeByIds:
+   flinkEnvironmentId: tempenv
+   cmfId:  CMF-id
+  principal:
+    name: kafka
+    type: user
+  role: DeveloperManage
+  resourcePatterns:
+  - name: "*"
+    patternType: LITERAL
+    resourceType: FlinkComputePool
+---
+apiVersion: platform.confluent.io/v1beta1
+kind: ConfluentRolebinding
+metadata:
+  name: kafka-flink-statements-rb
+  namespace: confluent
+spec:
+  clustersScopeByIds:
+   flinkEnvironmentId: tempenv
+   cmfId:  CMF-id
+  principal:
+    name: kafka
+    type: user
+  role: DeveloperManage
+  resourcePatterns:
+  - name: "*"
+    patternType: LITERAL
+    resourceType: FlinkStatement
