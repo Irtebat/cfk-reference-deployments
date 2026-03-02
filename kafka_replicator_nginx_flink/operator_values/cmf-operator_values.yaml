@@ -1,5 +1,5 @@
-operatorPod:
-  affinity:
+
+affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
@@ -8,18 +8,52 @@ operatorPod:
             operator: In
             values:
             - "cmfoperator"
-
-imagePullSecretRef: <>  
-
+jvmArgs: "-Djavax.net.ssl.trustStore=/mnt/truststore/truststore.jks -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.keyStore=/mnt/keystore/keystore.jks -Djavax.net.ssl.keyStorePassword=changeit"
 cmf:
+  stackTraceLogging: true
+  ssl:
+    keystore: /mnt/keystore/keystore.jks
+    keystore-password: changeit
+    trust-store: /mnt/truststore/truststore.jks
+    trust-store-password: changeit
+    client-auth: need
+
+  authentication:
+    type: mtls
+    config:
+      confluent.metadata.bootstrap.server.urls: https://kafka.confluent.svc.cluster.local:8090
+      public.key.path: /mnt/secrets/mds-token/mdsPublicKey.pem
+      auth.ssl.principal.mapping.rules: |
+        RULE:.*CN=([a-zA-Z0-9.-]*).*$/$1/,
+        RULE:^CN=(.*?),OU=ServiceUsers.*$/$1/,
+        DEFAULT
+  authorization:
+    mdsRestConfig:
+      endpoint: https://kafka.confluent.svc.cluster.local:8090
+      authentication:
+        type: mtls
+        config:
+          public.key.path: /mnt/secrets/mds-token/mdsPublicKey.pem
   sql:
     examples-catalog:
       enabled: true
     production: false
 
-
-image:
-  repository: <>:<>/confluentinc
-  name: cp-cmf
-  pullPolicy: IfNotPresent
-  tag: "2.2.0"
+mountedVolumes:
+  volumeMounts:
+    - name: truststore
+      mountPath: /mnt/truststore
+    - name: keystore
+      mountPath: /mnt/keystore
+    - name: mds-token
+      mountPath: /mnt/secrets/mds-token
+  volumes:
+    - name: keystore
+      secret:
+        secretName: mtlskeystore
+    - name: truststore
+      secret:
+        secretName: mtlstruststore
+    - name: mds-token
+      secret:
+        secretName: mds-token
