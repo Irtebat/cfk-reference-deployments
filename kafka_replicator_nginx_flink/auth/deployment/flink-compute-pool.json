@@ -4,28 +4,27 @@
     "flinkVersion": "v1_19",
     "image": "confluentinc/cp-flink-sql:1.19-cp5",
     "flinkConfiguration": {
+        "taskmanager.numberOfTaskSlots": "2",
        "execution.checkpointing.interval": "5m",
-      "job.autoscaler": {
-        "enabled": "true",
-        "stabilization.interval": "1m",
-        "metrics.window": "1m",
-        "target.utilization": "0.1",
-        "target.utilization.boundary": "0.0",
-        "restart.time": "1m",
-        "catch-up.duration": "2m" 
-      },
-    "pipeline.max-parallelism": "360"
+        "job.autoscaler.enabled": "true",
+        "job.autoscaler.stabilization.interval": "1m",
+        "job.autoscaler.metrics.window": "1m",
+        "job.autoscaler.target.utilization": "0.6",
+        "job.autoscaler.target.utilization.boundary": "0.1",
+        "job.autoscaler.restart.time": "1m",
+        "job.autoscaler.catch-up.duration": "2m",
+        "pipeline.max-parallelism": "360"
     },
     "taskManager": {
       "resource": {
-        "cpu": 1,
-        "memory": "1024m"
+        "cpu": 2,
+        "memory": "2048m"
       }
     },
     "jobManager": {
       "resource": {
-        "cpu": 1,
-        "memory": "1024m"
+        "cpu": 2,
+        "memory": "2048m"
       }
     }
   }
