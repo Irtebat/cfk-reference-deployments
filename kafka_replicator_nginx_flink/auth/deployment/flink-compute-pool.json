@@ -1,0 +1,32 @@
+{
+  "type": "DEDICATED",
+  "clusterSpec": {
+    "flinkVersion": "v1_19",
+    "image": "confluentinc/cp-flink-sql:1.19-cp5",
+    "flinkConfiguration": {
+       "execution.checkpointing.interval": "5m",
+      "job.autoscaler": {
+        "enabled": "true",
+        "stabilization.interval": "1m",
+        "metrics.window": "1m",
+        "target.utilization": "0.1",
+        "target.utilization.boundary": "0.0",
+        "restart.time": "1m",
+        "catch-up.duration": "2m" 
+      },
+    "pipeline.max-parallelism": "360"
+    },
+    "taskManager": {
+      "resource": {
+        "cpu": 1,
+        "memory": "1024m"
+      }
+    },
+    "jobManager": {
+      "resource": {
+        "cpu": 1,
+        "memory": "1024m"
+      }
+    }
+  }
+}
